@@ -1,0 +1,742 @@
+﻿//2017-07-24
+awk命令：
+awk -F "\t" '{print $1}' wenda_1_1.gbk | head
+iconv命令：
+iconv -f utf-8 -t gb18030 wenda_1_1.utf8 > wenda_1_1.gbk
+sort命令：
+sort -k1,1n sim.txt.seg 
+
+//2017-07-24
+1.hydoop学习：mapper/reducer
+  streaming架构
+2. url编码
+   query = urllib.unquote(query) 
+   query = query.decode("gbk", "ignore")
+   
+//2017-07-27
+dos2unix test_20170728_1.txt  // 将windows系统下的txt文本中的换行符转换成unix系统中的换行符
+nohup ./chatbot_test.py test_20170728_1.txt output_20170728.txt wechat > log & // nohup 后台运行进程
+ps aux  // 进程控制和显示
+kill 。。。 // 杀死相关进程
+grep 命令  // 可依据正则表达式显示相关文件
+
+//2017-07-31
+debug: baike_percent.py脚本，import chatdet时，本地运行可行，上传hadoop出错，原因是集群里没有chatdet包
+
+reducer的原理：
+
+print xx,xx输出时，是用空格分开的
+
+//2017-08-02
+awk函数进阶，过滤
+grep函数进阶
+比较命令vimdiff, svn log
+最终整理的排序结果中前一段有很多数字，需要进行过滤
+
+//2017-08-03
+paste 粘贴两个文件（同行）
+wc 查看文件字节数、行数
+
+//2017-08-04
+python中多断式的用法
+dict([itm.split('="') if len(itm.split('="    ')) == 2 
+else (itm, '') for itm in rank_str.replace('<rank ',     '')
+.replace('"></rank>', '').split('" ')])
+
+shell脚本中定义字符串
+STR1 = "abc"(错误写法)
+
+STR1="abc"(正确写法)
+不能有空格
+
+if[$STR1=$STR2](错误写法)
+
+if [ $STR1 = $STR2 ](正确写法)
+
+awk命令 length($1)可直接获取字符串的长度
+
+// 2017-08-07
+1.grep命令 grep 'xx\|xx\|xx' 不能少了转义符，不然不能多个义项进行选择
+2.python 中的in, 单个项在词典和列表是否存在可以直接用in，单个字母在字符串中的判断也可以使用，一串字符是否在另一串
+  字符中使用findt
+3. 中文字符用in判断时出现bug：Non-ASCII character '\xe5' in file
+  解决方法在行首添加#coding=utf-8后，可以使用中文字符编码用in
+
+// 2017-08-10
+Ctrl+w 切换窗口(vim）
+
+// 2017-08-16
+pdb.set_trace()  // 单步调试
+awk -F '\t' '{print $2}' bank_result.txt  | sort | uniq > bank-urls& 
+uniq -c testfile // 删除出现重复的行数
+
+// 2017-08-21
+cd - // 返回上一个（非上一级）目录
+AttributeError: 'Worksheet' object has no attribute 'nrows' // xlrd有该属性，xlwt没有，需要自己计算行数
+搜狗放炮哥是谁 在本地测试和集群测试的结果不一致 // get_yaoting的参数query需要作为
+import os // os包，用于管理本地文件及路径
+os.path.abspath(__file) // 当前文件的绝对路径
+os.path.dirname(abspath) // 指定绝对路径的目录地址
+os.path.join(dir, '../../lib') // 根据dir和str连接得到新的地址
+import sys // sys包，管理系统文件
+sys.path.append(dir) // 在程序链接库中增加dir指定的库
+sys.argv	// 传入参数
+import xlrd
+import xlwt	// 分别用于管理xls文件的读和写的工具包
+wb = xlrd.open_workbook(infilename) // 打开xls文件
+for sheet in wb.sheets():	// wb.sheets()为表格文件的每一个工作单
+xls = xlwt.Workbook() // 打开一个用于写入的表格
+table = xls.add_sheet(sheet.name) // sheet.name为sheet的名字，add_sheet在表格中加入一个工作单
+table.write(index, 0, query.decode('utf-8')) // 在一个sheet中[index, 0]位置写入str
+****** 代码路径：http://svn.sogou-inc.com/svn/websearch4/web/dialogue/chatbot
+svn checkout|co svn全路径 本地全路径（默认当前目录） 
+svn add *.php ＜－ 添加当前目录下所有的php文件
+svn commit -m “添加我的测试用全部php文件“ *.php
+
+// 2017-08-17
+??? Ques: 搜狗汪仔客户端和本地测试不一致，如下列问题：
+1. 鲁豫那么瘦是为什么
+2. 冯小刚的第一部影片是哪部
+3. 刘德华是四大天王之一么
+4. 为何说莫高窟是丝绸之路上的艺术殿堂
+5. 金庸写过哪些长篇武侠小说
+6. 搜狗放炮哥是谁
+。。。
+经过多次尝试发现，当web search返回的结果为空时，即使yaoting的结果是对的，也不会返回yaoting结果。
+应该是汪仔在结果判断中出现的问题。
+
+命令学习：
+svn update 更新当前目录下所有文件到最新版本
+svn up 文件名  //只更新当前文件到最新版本
+svn update -r 版本号 文件名 //将文件更新到指定版本
+
+svn　delete　svn://路径(目录或文件的全路径) -m “删除备注信息文本”
+推荐如下操作：
+svn　delete　文件名 
+svn　ci　-m　“删除备注信息文本”//进行备注说明
+
+svn　lock　-m　“加锁备注信息文本“　[--force]　文件名 // 对文件进行上锁
+svn　unlock　文件名 // 解锁
+
+// 2017-08-17
+svn命令学习
+svn　diff　文件名 
+svn　diff　-r　修正版本号m:修正版本号n　文件名 // 比较两个文件的差异
+svn diff -r 200:201 test.php //示例
+
+svn st // 显示目录下的文件和子目录状态
+
+svn log 文件名 // 显示这个文件的所有修改记录，及其版本号变化
+
+// 2017-08-18
+svn命令学习
+svn list svn://localhost/test  // 查看版本目录下的全部文件和子目录列表
+
+svn mkdir -m "Making a new dir." svn://localhost/test/newdir
+该命令用完后需要用 svn update 不然在该目录下提交文件会提示“提交失败”
+
+svn　revert　[--recursive]　文件名 // 丢弃对一个文件的修改，加上参数后为对目录的操作
+
+// 2017-09-04
+lsof -i:9200 // 查看端口号
+
+// 2017-09-07
+tar -zcvf 压缩后文件名 要压缩的文件或者目录
+tar -zxvf 待解压文件 -C 要解压到的目录
+xlwt的超链接读写操作:
+sheet.write(
+    0, 0,
+    Formula('HYPERLINK("http://www.python.org";"Python")'),
+    style)
+
+// 2017-09-08
+lambda关键字：sorted(list, key = lambda student: (-x[1], x[0]))
+map(f, list) // map函数
+zip() //zip函数 
+注意深度学习的交叉验证训练
+
+**********************************************************************
+**********************2017-09-09**************************************
+**********************************************************************
+每天一个linux命令：
+chattr +a|i 文件名称
+lsattr 文件目录 
+
+**********************************************************************
+**********************2017-09-15**************************************
+**********************************************************************
+libboost安装问题：
+在运行skill-platform中的platform_server.py时，一直提示：
+找不到libboost_python3.so.1.64.0，因此，从源代码编译boost_python。
+1.下载boost_1_64_0.tar.gz
+2.解压文件
+3.进入boost_1_64_0
+4.终端输入:./configure --with-python=python3 // 之前这一步没加，要用python3编译
+5.修改./tools/build/src/tools/python.jam,547行，includes ?= $(prefix)/include/python$(version)m ;
+（注意加上m）
+6.运行./b2 --with-python 
+7.运行./b2 install //这一步是将库加入/usr/local目录，很关键
+以上，完成libboost_python3.so.1.64.0的编译
+
+**********************************************************************
+**********************2017-09-15**************************************
+**********************************************************************
+vim命令：
+f命令用于行内快速查找，fx定位于本行本字符后的x字符上，
+t命令同上
+*命令，全文搜索当前词
+
+shell脚本:
+for f in $(ls | grep tupu) 
+do 
+  ...
+done
+// shell 脚本与shell命令结合，for循环
+
+--------？-------
+web search问题：海贼王的作者是谁
+回答出现了符号：》《尾田荣一郎...
+
+**********************************************************************
+**********************2017-09-15**************************************
+**********************************************************************
+linux去重：
+sort -u 文件名 > 新文件名 // 注意导向符不可缺，否则不对原文件进行操作
+
+
+**********************************************************************
+**********************2017-09-26**************************************
+**********************************************************************
+awk命令学习：
+NR:当前行数
+NF:当前列数
+for循环，if与c++类似，不需要指定变量类型，如: awk -F '·' '{ print $0; for (i = 1; i <= NF; i++) 
+    print $i}' OFS="\n" $before_file > $after_name
+$0指整行；
+OFS指定输出的分隔符
+
+**********************************************************************
+**********************2017-09-28**************************************
+**********************************************************************
+linux c++下编码的转换：
+从utf-8转换到gbk：
+1. locale -a 查看所有机器支持的编码，这里需要用到zh_CN.utf8和zh_CN.gbk，
+保证这两个编码在输出列表中；
+2. include <locale>包；
+3. 具体代码的关键步骤：
+   // 从utf8转换为gbk
+   setlocale(LC_ALL, "zh_CN.utf8"); // 将机器编码转换为zh_CN.utf8、
+   int medlen = mbstowcs(NULL, src, 0); // 测试unicode长度
+   wchar_t* medStr = (wchar_t*)calloc(sizeof(wchar_t), medlen）; // 分配wchar_t字符
+   mbstowcs(medStr, src, strlen(src));  // 将src转换为unicode
+   // 再重复一次，从unicode转换为gbk
+   setlocale(LC_ALL, "zh_CN.gbk"); // 将机器编码转换为zh_CN.gbk
+   int deslen = wcstombs(NULL, medStr, 0); // 测试gbk长度
+   char* gbkstr = new char[gbklen + 1];
+   wcstombs(medStr, src, strlen(src));  // 将src转换为unicode
+
+**********************************************************************
+**********************2017-09-29**************************************
+**********************************************************************
+c++编译错误：
+collect2: error: ld returned 1 exit status // 由于存在命名冲突造成的，
+                                           //我这边是因为冲突的libboost_regex定义（53和60的冲突）
+git fsck --lost-found // very good 
+
+**********************************************************************
+**********************2017-11-03**************************************
+**********************************************************************
+在计算机中计算n*(n+1)*(n-1)*(2*m-n)/12 mod （10e9 + 7)的值。其中n,m取值在int的正整数范围内。
+这看起来简单，但在c中最长整数表示为8个字节的限制下，需要考虑很多问题。利用同余的性质是关键。
+由于一开始不太熟悉，走了不少弯路。正确的做法是：先计算前边的所有乘积的模，根据最后结果，累
+加10e9+7得到可以被12整除的最小整数，之后除以12就可以了。
+
+**********************************************************************
+**********************2017-11-24**************************************
+**********************************************************************
+cat /etc/redhat-release 查看cent OS版本号
+curl -XPOST 'localhost:9200/twitter/tweet?routing=kimchy&pretty' -H 'Content-Type: application/json' -d'
+{
+    "user" : "kimchy",
+    "postDate" : "2009-11-15T14:12:12",
+    "message" : "trying out Elasticsearch"
+}
+'
+
+**********************************************************************
+**********************2017-12-11**************************************
+**********************************************************************
+python中的枚举类型：
+1.先定义枚举函数：
+def enum(**enums):
+  return type('Enum', (), enums)
+
+2.使用枚举函数定义枚举：
+  A = enum(B=1, C=2)
+
+3.调用枚举
+  print A.B
+
+**********************************************************************
+**********************2017-12-15**************************************
+**********************************************************************
+lsb_release -a (适用于所有的linux，包括Redhat、SuSE、Debian等发行版，但是在debian下要安装lsb)
+
+**********************************************************************
+**********************2017-12-27**************************************
+**********************************************************************
+A,Shell支持作用控制，有以下命令：
+1. command& 让进程在后台运行
+2. jobs 查看后台运行的进程
+3. fg %n 让后台运行的进程n到前台来
+4. bg %n 让进程n到后台去；   
+   PS:"n"为jobs查看到的进程编号.
+   
+**********************************************************************
+**********************2018-02-11**************************************
+**********************************************************************
+python reduce
+在python中，有很多为了处理列表和字典的便捷接口，比如说zip、map、lambda，
+今天学到了一个reduce函数，它对列表的每个元素进行判断，进行函数操作后生成
+新的列表，我用它来对元素是字典的列表进行去重。set方法没办法对字典元素列表
+进行去重，这是因为字典属于不可哈希类。因此通过reduce方法解决。
+
+**********************************************************************
+**********************2018-02-24**************************************
+**********************************************************************
+tensorflow中图Graph和会话Session的概念
+按照我的理解，Graph保存一个变量和结构，可以说是一个静止概念，就像神经网络
+的图形一样，由点和流程线构成；
+Session是一个运行概念，它将Graph中的变量输出成对应的形式。
+Graph中可以有多个Session，而Session中也可以有多个Graph。
+
+**********************************************************************
+**********************2018-02-28**************************************
+**********************************************************************
+linux grep命令不匹配：
+1. grep -v "xxx"  用-v命令表示不匹配某个字段
+2. grep "[^xxx]"  用正则表达式表示不匹配某个字段
+
+**********************************************************************
+**********************2018-03-05**************************************
+**********************************************************************
+Tensorflow容易犯的错误：
+全连接层最后一层容易加了某个非线性函数后，再用softmax；实际上最后直接
+wx+b然后softmax就可以了，多加了会影响结果，在此谨记，以免再犯同样的错误。
+
+
+**********************************************************************
+**********************2018-03-05**************************************
+**********************************************************************
+locust测试网站抗压能力的工具，locust网站地址：https://locust.io/
+
+**********************************************************************
+**********************2018-03-20**************************************
+**********************************************************************
+tensorflow中的数组操作：
+1. tf.scatter_nd_update()
+example:
+###
+    ref = tf.Variable([1, 2, 3, 4, 5, 6, 7, 8])
+    indices = tf.constant([[4], [3], [1] ,[7]])
+    updates = tf.constant([9, 10, 11, 12])
+    update = tf.scatter_nd_update(ref, indices, updates)
+    with tf.Session() as sess:
+      print sess.run(update)
+###
+2. tf.gather_nd()
+example:
+###
+    indices = [[1], [0]]
+    params = [['a', 'b'], ['c', 'd']]
+    output = [['c', 'd'], ['a', 'b']]
+###
+    indices = [[1]]
+    params = [[['a0', 'b0'], ['c0', 'd0']],
+              [['a1', 'b1'], ['c1', 'd1']]]
+    output = [[['a1', 'b1'], ['c1', 'd1']]]
+
+    indices = [[0, 1], [1, 0]]
+    params = [[['a0', 'b0'], ['c0', 'd0']],
+              [['a1', 'b1'], ['c1', 'd1']]]
+    output = [['c0', 'd0'], ['a1', 'b1']]
+
+    indices = [[0, 0, 1], [1, 0, 1]]
+    params = [[['a0', 'b0'], ['c0', 'd0']],
+              [['a1', 'b1'], ['c1', 'd1']]]
+    output = ['b0', 'b1']
+###
+3. tf.squeeze()
+function: Removes dimensions of size 1 from the shape of a tensor.
+example: 
+###
+    # 't' is a tensor of shape [1, 2, 1, 3, 1, 1]
+    tf.shape(tf.squeeze(t))  # [2, 3]
+###
+    # 't' is a tensor of shape [1, 2, 1, 3, 1, 1]
+    tf.shape(tf.squeeze(t, [2, 4]))  # [1, 2, 3, 1]
+###
+
+**********************************************************************
+**********************2018-03-21**************************************
+**********************************************************************
+今天在用git push到远程服务器时遇到代理无法访问的问题，在105.106这台机器
+上，当时以为git访问远程服务必须使用正确的代理（毕竟我是用公司的服务器跑的
+）。今天找到了解决方法，一条命令：
+git config --global --unset http.proxy
+取消git的代理设置即可，看来想太多有时并不是好事啊。
+
+**********************************************************************
+**********************2018-03-23**************************************
+**********************************************************************
+解决同一台机器上提交多个git服务器的方法：（以自已的例子为例）
+在~/.ssh目录下已经有公用的id_rsa，连接到公司的git服务器上。以下建立自己
+的id_rsa
+1. 生成新的id_rsa，取名xxx_id_rsa（名称随意，有区别就行）：
+cd ~/.ssh
+ssh-keygen -t rsa -C "gejx2010@gmail.com"
+2. 添加私钥
+ssh-agent -s
+ssh-add ~/.ssh/gejx_id_rsa(若执行出错则执行"ssh-agent bash"后再执行本句，我的情况就是这样通过的）。
+3. 将私钥添加到自己的git账户上，即添加ssh key粘贴gejx_id_rsa.pub的内容。
+4. 配置config
+cd ~/.ssh
+touch config
+config的内容如下：
+
+'''
+# self(gejx2010@gmail.com)
+Host github.com
+HostName github.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/gejx_id_rsa
+User gejx
+'''
+
+5. 测试：
+ssh -T git@github.com 
+如果显示：
+Hi gejx2010! You've successfully authenticated, but GitHub does not provide shell access.
+则为成功。此时可以使用git push|pull 等命令连接自己的git账户。
+
+**********************************************************************
+**********************2018-03-28**************************************
+**********************************************************************
+tensorflow 拆分tensor的方法：
+1. tf.split()
+	# 'value' is a tensor with shape [5, 30]
+	# Split 'value' into 3 tensors with sizes [4, 15, 11] along dimension 1
+	split0, split1, split2 = tf.split(value, [4, 15, 11], 1)
+	tf.shape(split0)  # [5, 4]
+	tf.shape(split1)  # [5, 15]
+	tf.shape(split2)  # [5, 11]
+	# Split 'value' into 3 tensors along dimension 1
+	split0, split1, split2 = tf.split(value, num_or_size_splits=3, axis=1)
+	tf.shape(split0)  # [5, 10]
+2. tf.dynamic_partition()
+    # Scalar partitions.
+    partitions = 1
+    num_partitions = 2
+    data = [10, 20]
+    outputs[0] = []  # Empty with shape [0, 2]
+    outputs[1] = [[10, 20]]
+
+    # Vector partitions.
+    partitions = [0, 0, 1, 1, 0]
+    num_partitions = 2
+    data = [10, 20, 30, 40, 50]
+    outputs[0] = [10, 20, 50]
+    outputs[1] = [30, 40]
+	
+**********************************************************************
+**********************2018-04-23**************************************
+**********************************************************************
+在skill_platform代码中，import acmotion时遇到以下问题：
+Eroor: ImportError: libboost_python27.so.1.67.0: cannot open shared object
+ file: No such file or directory
+解决步骤：
+1. 使用命令：
+locate libboost_python27.so
+显示如下：
+/search/odin/spgoal/lib_sp/boost_1_67_0/bin.v2/libs/python/build/gcc-4.8.5/release/threading-multi/libboost_python27.so.1.67.0
+/search/odin/spgoal/lib_sp/boost_1_67_0/stage/lib/libboost_python27.so
+/search/odin/spgoal/lib_sp/boost_1_67_0/stage/lib/libboost_python27.so.1.67.0
+/usr/lib/libboost_python27.so
+/usr/lib/libboost_python27.so.1.67.0
+该结果显示文件存在，说明相关路径没有添加到系统路径中。（若没有显示结果，则说明boost未编译安装成功，需要重新编译生成该文件）
+2. 使用如下命令编辑系统路径:
+vim ~/.bashrc
+添加以下行：
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib"
+3. 重新编译c++代码生成acmotion及acmotion.so，问题解决。
+
+**********************************************************************
+**********************2018-04-23**************************************
+**********************************************************************
+scp文件传输时，遇到乱码问题，原文件使用utf-8编译，copy后变成乱码.
+该问题和linux系统语言设置有关。原机器上，locale的设置为en_US.UTF-8,
+而新机器上为en_US。使用以下命令后解决问题：
+export LC_ALL=en_US.UTF-8
+
+**********************************************************************
+**********************2018-04-24**************************************
+**********************************************************************
+很厉害的一个命令：
+os.system("rm -rf " + dir_name)
+利用os.system()接口直接调用命令行命令。
+
+**********************************************************************
+**********************2018-04-26**************************************
+**********************************************************************
+linux查看nvidia显卡：
+lspci | grep -i nvidia  
+查看显卡信息：
+lspci -v -s 00:0f.0  
+
+**********************************************************************
+**********************2018-04-26**************************************
+**********************************************************************
+boost.python安装：
+1）下载boost(网址https://www.boost.org/，我的是boost_1_67_0.tar.gz)
+wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz
+2） 安装：
+tar -zxvf boost_1_67_0.tar.gz
+cd boost_1_67_0
+./bootstrap.sh --with-python=PYTHON --prefix=/usr
+./bootstrap.sh --with-libraries=system,thread,python
+sudo ./b2 install
+./b2 cxxflags=-fPIC cflags=-fPIC --c++11
+
+**********************************************************************
+**********************2018-05-02**************************************
+**********************************************************************
+配置nvidia驱动：
+Part I.
+# 确保nouveau被禁用
+$ lsmod | grep nouveau
+若以上命令输出信息，则表示nouveau没有被禁用。
+在centos系统中在/etc/modprobe.d/blacklist-nouveau.conf（没有则创建）文件中输入:
+blacklist nouveau
+options nouveau modeset=0
+重新生成kernel initramtf:
+$ sudo dracut --force
+
+Part II.
+# python-pip 安装并更新到最新目录
+yum install python-pip
+pip install --upgrade pip
+# boost.python安装（参见daily)
+
+Part III. (安装GPU驱动)
+# 1. 安装gcc工具
+yum install gcc*
+# 2. 安装dkms
+wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -ivh epel-release-latest-7.noarch.rpm
+yum install --enablerepo=epel dkms
+# 3. 安装kernel 开发包等
+yum install kernel*
+# 4. 安装cuda
+wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
+###(此处根据对应机型以及tensorflow对应版本寻找合适版本安装，例如，我想安装tensorflow1.8.0，在https://www.tensorflow.org/install/install_sources#common_installation_problems
+网站上发现需要cuda9.0以及cudnn7，因此需要cuda9.0，9.1或者其他版本不适用)
+sh cuda_9.0.176_384.81_linux-run --silent --driver --toolkit --toolkitpath=/tmp/ --samples --samplespath=/tmp/ --verbose
+###(路径可修改，此处安装可能会有丢失包，看打印信息，比如我安装时有libX11.so,libXi.so等未安装，则使用yum install libX11命令安装上，余
+###(者类推)
+# 5. 编辑环境变量
+在~/.bashrc中添加以下几行。
+CUDA_HOME=/usr
+PATH=$PATH:$CUDA_HOME/bin
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64
+使环境变量生效：
+$ source ~/.bashrc
+# 6. 挂载驱动
+modprobe nvidia
+###(到此CUDA安装成功)
+
+Part IV. 安装cuDNN
+官网地址：https://developer.nvidia.com/cudnn
+按照指示下载软件，我下载的是：cudnn-9.0-linux-x64-v7
+安装：
+$ tar -xzvf cudnn-9.0-linux-x64-v7
+$ sudo cp cuda/include/cudnn.h /tmp/include
+$ sudo cp cuda/lib64/libcudnn* /tmp/lib64
+$ sudo chmod a+r /tmp/include/cudnn.h /tmp/lib64/libcudnn*
+
+Part V. 安装Tensorflow
+pip install tensorflow-gpu==1.4.1(为了使服务器上的tensorflow版本同步，不加版本号默认为最新)
+
+Part VI. 测试
+$ python
+$ >>> import tensorflow as tf
+  >>> (如果此处不成功，提示：ImportError: libcublas.so.9.0: cannot open shared object file: No such file or directory
+  则添加以下指令：则添加以下指令：
+  $ echo "/tmp/lib64" >> /etc/ld.so.conf.d/cuda.conf
+  $ ldconfig)
+  >>> hello = tf.constant('Hello, TensorFlow!')
+  >>> sess = tf.Session()
+  >>> print(sess.run(hello))
+  Hello, TensorFlow!
+若通过以上测试，说明安装tensorflow成功。
+
+**********************************************************************
+**********************2018-05-03**************************************
+**********************************************************************
+文件去重等相关操作：
+1. 取出两个文件的并集(重复的行只保留一份)
+$ cat file1 file2 | sort | uniq > file3
+2. 取出两个文件的交集(只留下同时存在于两个文件中的文件)
+$ cat file1 file2 | sort | uniq -d > file3
+3. 删除交集，留下其他的行
+$ cat file1 file2 | sort | uniq -u > file3
+4. 合并两个文件
+4.1 一个文件在上，一个文件在下
+$ cat file1 file2 > file3
+4.2 一个文件在左，一个文件在右
+$ paste file1 file2 > file3
+5. 一个文件去掉重复的行
+$ sort file | uniq
+注意：重复的多行记为一行，也就是说这些重复的行还在，只是全部省略为一行！
+$ sort file | uniq –u
+上面的命令可以把重复的行全部去掉，也就是文件中的非重复行！
+
+**********************************************************************
+**********************2018-05-26**************************************
+**********************************************************************
+java.net.UnknownHostException: xxx: 未知的名称或服务
+这是由于本地域名localhost未解析造成的。我出该问题的机器是nmyjs_105_106,
+将它映射到127.0.0.1上即可，即在/etc/hosts添加一行：
+127.0.0.1 nmyjs_105_106 localhost
+
+**********************************************************************
+**********************2018-06-05**************************************
+**********************************************************************
+pip --default-timeout=100 （设置延迟时间） -i https://pypi.tuna.tsinghua.edu.cn/simple (设置源）--ignore-installed ipython (忽略包针）
+cat /usr/local/cuda/version.txt
+
+**********************************************************************
+**********************2018-06-13**************************************
+**********************************************************************
+cuda 版本 
+cat /usr/local/cuda/version.txt
+
+cudnn 版本 
+cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+
+**********************************************************************
+**********************2018-07-02**************************************
+**********************************************************************
+安装Expect:
+1. 下载最新版本的Tcl和Expect
+已下载位置：(root@10.141.105.106:/search/odin/gejx2010/software/soft_expect)
+2. 解压安装包
+unzip tcl868-src.zip
+tar -zxvf expect5.45.3.tar.gz
+3. 安装TCL
+  3.1 进入解压目录tcl8.6.8/unix，然后依次执行以下命令：
+	sed -i "s/relid'/relid/" configure
+	./configure --prefix=/expect
+	make
+	make install
+	mkdir -p /tools/lib
+	cp tclConfig.sh /tools/lib/
+  3.2 将/tools/bin目录export到环境变量，在~/.bashrc中编辑：
+	export tclpath=/tools/bin
+	source ~/.bashrc
+4. 安装Expect
+  4.1 进入解压目录expect5.45.3，执行：
+    ./configure --prefix=/tools --with-tcl=/tools/lib --with-x=no
+	如果最后一行提示：
+	configure: error: Can't find Tcl private headers
+	则需要添加一个头文件目录参数：即执行：
+	./configure --prefix=/tools --with-tcl=/tools/lib --with-x=no --with-tclinclude=../tcl8.4.11/generic
+	然后：
+	make
+	make install
+	编译完成后会生在/tools/bin内生成expect命令(我的是在解压目录中生成的，将它拷贝到了/tools/bin中仍然能用）
+    执行/tools/bin/expect出现expect1.1>提示符说明expect安装成功. 
+5. 创建符号链接
+    ln -s /tools/bin/expect /usr/bin/expect 
+	
+**********************************************************************
+**********************2018-07-03**************************************
+**********************************************************************
+一、命令行解析工具：
+import argparse
+parser.add_argument('--batch_size', default=100, type=int, help='batch size')
+
+二、pip的相关命令参数对python同样适用，或者说是从python衍生出去的
+python test.py --default-timeout=100 -i https://pypi.tuna.tsinghua.edu.cn/simple
+在研究tf-hub时发现的，由于经常出现超时，以及下载速度过慢，所以尝试使用了pip控制超时的参数，可以通过。
+
+**********************************************************************
+**********************2018-07-13**************************************
+**********************************************************************
+注重异步程序的编写：
+from tornado.httpclient import AsyncHTTPClient
+import asyncio
+import json
+import urllib
+
+async def check_music(query):
+    client = AsyncHTTPClient()
+    resp = await client.fetch("http://10.141.105.106:5858/response?query=%s" % urllib.parse.quote_plus(query))
+    maybe_music = json.loads(resp.body.decode("utf-8"))[0] == 1
+    if maybe_music:
+        r = await search_qq_music(query)
+        if r is not None:
+            return True, {"music_result": r}
+    return False, None
+	
+async def main():
+    r = await check_music("周杰伦的青花瓷")
+	print ("r:", r)
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+	loop.run_until_complete(main())
+
+可以学习的地方：
+1. async 定义异步函数；
+2. 使用await导出异步函数的结果；
+3. 使用event loop运行异步函数；
+4. 使用AsyncHTTPClient()引入异步请求Client，使用fetch方法获得请求结果；
+5. 使用urllib.parse.quote_plus转义query函数；
+
+**********************************************************************
+**********************2018-07-13**************************************
+**********************************************************************
+字符串拼接方法：
+a = "".join("bcd")
+
+**********************************************************************
+**********************2018-08-08**************************************
+**********************************************************************
+git针对不同项目设置不同的用户名（不需要修改全局设置）:
+1. 进入git项目文件夹根目录，配置文件在.git/config中，使用如下命令可以修改
+用户名和邮箱：
+git config user.name "gejunxiang"
+git config user.email "gejunxiang@sogou-inc.com"
+如果有必要，使用如下命令取消全局设置：
+git config --global --unset user.name
+git config --global --unset user.email
+2. ~/.ssh/config配置，参见(2018-03-23的日志），设置针对本项目的内容，例如我的：
+'''
+# self(gejunxiang@sogou-inc.com)
+Host intent
+HostName git.sogou-inc.com
+PreferredAuthentications publickey
+IdentityFile /root/.ssh/gejx_sogou_id_rsa
+User gejunxiang
+'''
+3. 在本地git项目的config中，将url中的hostname url改成~/.ssh/config中使用的host，我的情况是：
+原来：
+[remote "origin"]
+    url = git@git.sogou-inc.com:gejunxiang/IntentJustify.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+修改后：
+[remote "origin"]
+    url = git@intent:gejunxiang/IntentJustify.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+	
+只有这样，git才能正确使用配置的内容。 
