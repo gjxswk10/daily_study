@@ -740,3 +740,66 @@ User gejunxiang
     fetch = +refs/heads/*:refs/remotes/origin/*
 	
 只有这样，git才能正确使用配置的内容。 
+
+**********************************************************************
+**********************2018-08-27**************************************
+**********************************************************************
+1.这会为你保留本地文件，但会在其他人拉下时删除它。
+
+git rm --cached <file-name>或git rm -r --cached <folder-name>
+
+2.这是为了优化，就像一个包含大量文件的文件夹，例如可能永远不会改变的SDK。 它告诉git每次更改时都不再检查那个大文件夹，因为它没有任何更改。
+
+git update-index --assume-unchanged <path-name>
+
+3. 这是告诉git你想要你自己的独立版本的文件或文件夹。 例如，您不想覆盖（或删除）生产/登台配置文件。
+
+git update-index --skip-worktree <path-name>
+
+**********************************************************************
+**********************2018-08-30**************************************
+**********************************************************************
+一、 今天遇到python3中的编码问题，具体是这样的：
+    从xiaowei请求时，拿到的response基本是utf-8编码的，但有个别会报UnicodeDecodeError；细查后发现
+    这些response中有不合法编码（unicode的编码），导致上述错误。在查询API后发现以下解决方法：
+	response.body().decode("utf-8", errors="replace")
+	errors对应不同的处理方法，replace是针对出现unicode编码时的替换；ignore是忽略；
+	
+二、对于git的一个困扰是：一旦在某一次向仓库中提交一个大文件后，即便后来将其删除或者加入ignore，文件仍然会保留在历史
+记录中(.git)。如果这些文件曾被提交到服务器，会造成远程库新建时把这些记录也一并抓取，造成抓取缓慢。
+搜索过程中学到了以下有意思的指令，记录一下：
+----------------------------------------------------------------------------------------
+链接1:（https://segmentfault.com/q/1010000002564327）
+1. 新建一个可以作为根的分支：
+	git checkout --orphan new_start
+	然后使用：
+	git branch -D master
+	可以完全丢弃之前的历史记录。
+	不过令人失望的是，该方法的操作记录仍然会记录在.git中，大文件记录无法抹去。
+2. git rebase命令，该命令并没有使用，虽然有趣，因为估计效果和1的作用差不多；
+-----------------------------------------------------------------------------------------
+链接2：https://git-scm.com/book/zh/v1/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E7%BB%B4%E6%8A%A4%E5%8F%8A%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D
+这部分内容主要学习了git gc以及相关命令，包括：
+1. git count-objects -v 查询使用空间
+2. git verify-pack -v .git/objects/pack/pack*.idx | sort -k3nr | tail -3 查看objects的大小及记录
+3. git rev-list --objects --all | grep 7a9eb2fb 查看objects的名称（看到这我心想，要是早点知道这条命令多好，之前
+有过一次类似的情况，但我是把objects一条条恢复的，因为不知道文件的名字）
+4. git log --pretty=oneline --branches -- git.tbz2 找出与文件相关的记录
+5. git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch shorten_tupu' -- 6df7640^..
+   rm -Rf .git/refs/original
+   rm -Rf .git/logs
+   git gc
+
+------------------------------------------------------------------------------------------
+链接3：https://stackoverflow.com/questions/1029969/why-is-my-git-repository-so-big/1036595#1036595
+1. git gc --prune=now --aggressive
+   git repack
+-------------------------------------------------------------------------------------------   
+上述三个方法都有尝试，均未成功。最终解决问题的方案为（基本是在链接2的基础上）：
+$ git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch "shorten_tupu tree_tupu"' --prune-empty -- --all
+$ rm -rf .git/refs/original
+$ rm -rf .git/logs
+$ git gc
+$ git prune --expire now (这行是完全删除，谨慎；上一步已经可以保证大文件不再传播）
+$ git push origin master --force --all
+
