@@ -502,10 +502,12 @@ wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz
 2） 安装：
 tar -zxvf boost_1_67_0.tar.gz
 cd boost_1_67_0
-./bootstrap.sh --with-python=PYTHON --prefix=/usr
-./bootstrap.sh --with-libraries=system,thread,python
-sudo ./b2 install
+./bootstrap.sh --with-python=PYTHON --prefix=/search/odin/spgoal/lib/boost \
+  --with-libraries=system,thread,python
+./b2 install
 ./b2 cxxflags=-fPIC cflags=-fPIC --c++11
+echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/search/odin/spgoal/lib/boost/lib" >> ~/.bashrc
+source ~/.bashrc
 
 **********************************************************************
 **********************2018-05-02**************************************
@@ -564,7 +566,7 @@ $ sudo cp cuda/lib64/libcudnn* /tmp/lib64
 $ sudo chmod a+r /tmp/include/cudnn.h /tmp/lib64/libcudnn*
 
 Part V. 安装Tensorflow
-pip install tensorflow-gpu==1.4.1(为了使服务器上的tensorflow版本同步，不加版本号默认为最新)
+pip install tensorflow-gpu==1.8.0(为了使服务器上的tensorflow版本同步，不加版本号默认为最新)
 
 Part VI. 测试
 $ python
@@ -1183,3 +1185,63 @@ python为结构或者方法增加in关键字：
 	6.2）long long时还要注意；
 	6.3）c++转换字符串时要注意在最后加上休止符'\0'。
 =======
+
+**********************************************************************
+**********************2018-10-23**************************************
+**********************************************************************
+一、tornado.options.parse_command_line()函数会默认为我们配置标准logging
+    模块，即默认开启了日志功能，并向标准输出（屏幕）打印日志信息。如果
+	想关闭tornado默认的日志功能，代码中该句之前添加：
+	options.logging = None
+	options.parse_command_line()
+	
+**********************************************************************
+**********************2018-10-24**************************************
+**********************************************************************
+一、linux命令ab测试服务器性能
+  ab -c 5 -n 5 http://10.141.105.106:8787/?query=xxx(-c指定并发数，-n指定用户数)
+  
+**********************************************************************
+**********************2018-10-25**************************************
+**********************************************************************
+一、安装python3.x(python3.6为例)的简单方法(yum直接安装):
+  yum -y install https://centos7.iuscommunity.org/ius-release.rpm; 
+  yum -y install python36u python36u-devel
+  wget https://bootstrap.pypa.io/get-pip.py
+  python3.6 get-pip.py(或者yum install python36u-pip -y)
+二、rpm打包方法学习：
+  宏列表：
+	%{_sysconfdir}        /etc
+	%{_prefix}            /usr
+	%{_exec_prefix}       %{_prefix}
+	%{_bindir}            %{_exec_prefix}/bin
+	%{_libdir}            %{_exec_prefix}/%{_lib}
+	%{_libexecdir}        %{_exec_prefix}/libexec
+	%{_sbindir}           %{_exec_prefix}/sbin
+	%{_sharedstatedir}    /var/lib
+	%{_datarootdir}       %{_prefix}/share
+	%{_datadir}           %{_datarootdir}
+	%{_includedir}        %{_prefix}/include
+	%{_infodir}           /usr/share/info
+	%{_mandir}            /usr/share/man
+	%{_localstatedir}     /var
+	%{_initddir}          %{_sysconfdir}/rc.d/init.d
+	%{_var}               /var
+	%{_tmppath}           %{_var}/tmp
+	%{_usr}               /usr
+	%{_usrsrc}            %{_usr}/src
+	%{_lib}               lib (lib64 on 64bit multilib systems)
+	%{_docdir}            %{_datadir}/doc
+	%{buildroot}          %{_buildrootdir}/%{name}-%{version}-%{release}.%{_arch}
+	$RPM_BUILD_ROOT       %{buildroot}
+  rpm build目录：
+	!/rpmbuild				%_topdir		顶层目录			
+    ~/rpmbuild/SPECS		%_specdir		Spec 文件目录		保存 RPM 包配置（.spec）文件
+	~/rpmbuild/SOURCES		%_sourcedir		源代码目录			保存源码包（如 .tar 包）和所有 patch 补丁
+	~/rpmbuild/BUILD		%_builddir		构建目录			源码包被解压至此，并在该目录的子目录完成编译
+	~/rpmbuild/BUILDROOT	%_buildrootdir	最终安装目录		保存 %install 阶段安装的文件
+	~/rpmbuild/RPMS			%_rpmdir		标准 RPM 包目录		生成/保存二进制 RPM 包
+	~/rpmbuild/SRPMS		%_srcrpmdir		源代码 RPM 包目录	生成/保存源码 RPM 包(SRPM)
+  rpm 隐藏文件(~/.rpmmacros)，可以定义在当前工程下，可以定义系统变量，当前工程生效：
+	%_topdir       /home/ambari/rpm
+	%_tmppath      /home/ambari/rpm/tmp
