@@ -1282,3 +1282,57 @@ python为结构或者方法增加in关键字：
 	%_topdir       /home/ambari/rpm
 	%_tmppath      /home/ambari/rpm/tmp
 
+**********************************************************************
+**********************2018-10-31**************************************
+**********************************************************************
+一、Centos搭建ftp服务器
+	yum install -y vsftpd 
+
+二、docker修改默认配置路径： /etc/docker/daemon.json
+	docker文档及安装：https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
+    docker卸载：sudo yum remove docker \
+					docker-client \
+					  docker-client-latest \
+					  docker-common \
+					  docker-latest \
+					  docker-latest-logrotate \
+					  docker-logrotate \
+					  docker-selinux \
+					  docker-engine-selinux \
+					  docker-engine
+					  
+**********************************************************************
+**********************2018-11-01**************************************
+**********************************************************************
+一、docker安装nvidia-docker问题及为使用tensorflow-gpu for docker：
+	参照nvidia-docker的git文档使用下列脚本安装:
+	# If you have nvidia-docker 1.0 installed: we need to remove it and all existing GPU containers
+	docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
+	sudo yum remove nvidia-docker
+
+	# Add the package repositories
+	distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+	curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | \
+	  sudo tee /etc/yum.repos.d/nvidia-docker.repo
+
+	# Install nvidia-docker2 and reload the Docker daemon configuration
+	sudo yum install -y nvidia-docker2
+	sudo pkill -SIGHUP dockerd
+
+	# Test nvidia-smi with the latest official CUDA image
+	docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi	
+	遇到/etc/docker/daemon.json无法创建的问题，查找许久未发现原因，最后定位是docker版本太低导致的；
+	机器上装的是docker_18.06.0，重装docker_18.06.1，问题解决。
+	以下测试安装并验证nvidia-docker和nvidia/cuda：
+	docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
+	
+二、requests问题：
+    requests包是很多其他包依赖的软件，使用pip uninstall requests并无法删除干净该包，因此也不能直接
+	使用pip install --upgrade requests的方法进行升级。需要从源码安装升级。
+	1）删除现有目录：rm -rf /usr/lib/python2.7/site-packages/requests
+	2) git clone git://github.com/kennethreitz/requests.git
+	3) cd requests && python setup.py install
+	在import requests时仍然遇到urllib3的import问题，使用：
+	pip install --upgrade urllib3
+	解决
+	

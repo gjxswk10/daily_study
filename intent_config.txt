@@ -1,0 +1,60 @@
+# 1. IntentJustify环境配置:
+cd /search/odin
+mkdir spgoal
+echo "alias gp='cd /search/odin/spgoal'" >> ~/.bashrc
+source ~/.bashrc
+
+#2. 配置git.sogou-inc.com的账户
+cd ~/.ssh
+ssh-keygen -t rsa -C "gejunxiang@sogou-inc.com"
+ssh-agent -s
+ssh-agent bash
+ssh-add ~/.ssh/gejx_id_rsa
+...(将生成的gejx_id_rsa.pub文件加到git账户上)
+
+#3. 配置config
+cd ~/.ssh
+touch config
+#3.1 config的内容如下：
+
+('''
+# self(gejx2010@gmail.com)
+Host intent
+HostName git.sogou-inc.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/gejx_id_rsa
+User spgoal
+''')
+#4. 测试git账户
+ssh -T git@intent
+
+#5. 部署必要环境
+gp
+yum -y install python-pip
+pip install --upgrade pip
+pip install tornado xlwt xlrd
+pip install --upgrade gensim
+pip install locustio --ignore-installed requests
+
+#5.1）配置boost: (参见daily_study: $2018-04-26)
+#5.2）配置tensorflow: (参见daily_study: $2018-05-02)
+
+#6. 拷贝IntentJustify工程
+gp
+git clone git@git.sogou-inc.com:gejunxiang/IntentJustify.git
+cd IntentJustify
+mkdir -p kim_cnn_output/model_control/cnn_multi_2/180611
+cd kim_cnn_output/model_control/cnn_multi_2/180611
+scp -r root@10.153.58.67:/search/odin/spgoal/IntentJustify/kim_cnn_output/model_control/cnn_multi_2/180611/* .
+...(确认及输入密码)
+cd ../../../..
+
+#7. 拷贝必要数据：
+#7.1 拷贝使用到的模型数据
+#7.2 拷贝词向量信息
+#7.3 拷贝tree_tupu
+
+#8. 运行程序:
+nohup python cnn_server.py &
+
+#Done!
