@@ -1336,3 +1336,49 @@ python为结构或者方法增加in关键字：
 	pip install --upgrade urllib3
 	解决
 	
+	
+**********************************************************************
+**********************2018-11-07**************************************
+**********************************************************************
+一、c++ 11新特性总结:
+    1）nullptr:	区别NULL和0出现。当需要使用 NULL 时候，养成直接使用 nullptr的习惯。
+	2）auto关键字和decltype关键字，分别对变量和表达式自动进行类型推导；
+	3）for循环的简单化: for(auto &i: arr);
+	4) 初始化列表： vector<int> a = {1, 3, 5, 7, 9};
+	5) 模板增加： 
+	   5.1）vector<vector<int>>合法；
+	   5.2）默认模板template<typename T=int, typename U=int>
+	   5,3）模板别名：template<typename T>
+	                  using NewType = SuckType<int, T, 1>;	
+	6）类继承：
+	   struct B : A {
+	        using A::A;
+	   }
+	7) lambda表达式：
+		[capture[ , =, &]](params) opt[mutable] -> ret { body; }
+		int a = 0;
+		auto f = [&a] { return a;
+		lambad与STL函数的结合使用：
+		int value = 3;
+		vector<int> v {1, 3, 5, 2, 6, 10};
+		int count = std::count_if(v.beigin(), v.end(), [value](int x) { return x > value; });
+		还有generate, for_each;
+	8) 新增容器：
+	     array, forward_list, unordered系列，
+		 tuple：三个核心接口：make_tuple | get | tie;
+    9) 正则表达式：
+	    std::regex base_regex("([a-z]+)\\.txt");
+		std::smatch base_match;
+		for(const auto &fname: fnames) {
+			if (std::regex_match(fname, base_match, base_regex)) {
+				// sub_match 的第一个元素匹配整个字符串
+				// sub_match 的第二个元素匹配了第一个括号表达式
+				if (base_match.size() == 2) {
+					std::string base = base_match[1].str();
+					std::cout << "sub-match[0]: " << base_match[0].str() << std::endl;
+					std::cout << fname << " sub-match[1]: " << base << std::endl;
+				}
+			}
+		}
+
+	    
