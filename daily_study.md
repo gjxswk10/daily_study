@@ -12,7 +12,7 @@ sort -k1,1n sim.txt.seg
 2. url编码
    query = urllib.unquote(query) 
    query = query.decode("gbk", "ignore")
-   
+
 //2017-07-27
 dos2unix test_20170728_1.txt  // 将windows系统下的txt文本中的换行符转换成unix系统中的换行符
 nohup ./chatbot_test.py test_20170728_1.txt output_20170728.txt wechat > log & // nohup 后台运行进程
@@ -145,9 +145,9 @@ tar -zcvf 压缩后文件名 要压缩的文件或者目录
 tar -zxvf 待解压文件 -C 要解压到的目录
 xlwt的超链接读写操作:
 sheet.write(
-    0, 0,
-    Formula('HYPERLINK("http://www.python.org";"Python")'),
-    style)
+​    0, 0,
+​    Formula('HYPERLINK("http://www.python.org";"Python")'),
+​    style)
 
 // 2017-09-08
 lambda关键字：sorted(list, key = lambda student: (-x[1], x[0]))
@@ -203,7 +203,6 @@ web search问题：海贼王的作者是谁
 linux去重：
 sort -u 文件名 > 新文件名 // 注意导向符不可缺，否则不对原文件进行操作
 
-
 **********************************************************************
 **********************2017-09-26**************************************
 **********************************************************************
@@ -211,7 +210,7 @@ awk命令学习：
 NR:当前行数
 NF:当前列数
 for循环，if与c++类似，不需要指定变量类型，如: awk -F '·' '{ print $0; for (i = 1; i <= NF; i++) 
-    print $i}' OFS="\n" $before_file > $after_name
+​    print $i}' OFS="\n" $before_file > $after_name
 $0指整行；
 OFS指定输出的分隔符
 
@@ -240,7 +239,7 @@ linux c++下编码的转换：
 **********************************************************************
 c++编译错误：
 collect2: error: ld returned 1 exit status // 由于存在命名冲突造成的，
-                                           //我这边是因为冲突的libboost_regex定义（53和60的冲突）
+​                                           //我这边是因为冲突的libboost_regex定义（53和60的冲突）
 git fsck --lost-found // very good 
 
 **********************************************************************
@@ -257,9 +256,9 @@ git fsck --lost-found // very good
 cat /etc/redhat-release 查看cent OS版本号
 curl -XPOST 'localhost:9200/twitter/tweet?routing=kimchy&pretty' -H 'Content-Type: application/json' -d'
 {
-    "user" : "kimchy",
-    "postDate" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
+​    "user" : "kimchy",
+​    "postDate" : "2009-11-15T14:12:12",
+​    "message" : "trying out Elasticsearch"
 }
 '
 
@@ -324,7 +323,6 @@ Tensorflow容易犯的错误：
 全连接层最后一层容易加了某个非线性函数后，再用softmax；实际上最后直接
 wx+b然后softmax就可以了，多加了会影响结果，在此谨记，以免再犯同样的错误。
 
-
 **********************************************************************
 **********************2018-03-05**************************************
 **********************************************************************
@@ -355,12 +353,12 @@ example:
     params = [[['a0', 'b0'], ['c0', 'd0']],
               [['a1', 'b1'], ['c1', 'd1']]]
     output = [[['a1', 'b1'], ['c1', 'd1']]]
-
+    
     indices = [[0, 1], [1, 0]]
     params = [[['a0', 'b0'], ['c0', 'd0']],
               [['a1', 'b1'], ['c1', 'd1']]]
     output = [['c0', 'd0'], ['a1', 'b1']]
-
+    
     indices = [[0, 0, 1], [1, 0, 1]]
     params = [[['a0', 'b0'], ['c0', 'd0']],
               [['a1', 'b1'], ['c1', 'd1']]]
@@ -681,22 +679,22 @@ import json
 import urllib
 
 async def check_music(query):
-    client = AsyncHTTPClient()
-    resp = await client.fetch("http://10.141.105.106:5858/response?query=%s" % urllib.parse.quote_plus(query))
-    maybe_music = json.loads(resp.body.decode("utf-8"))[0] == 1
-    if maybe_music:
-        r = await search_qq_music(query)
-        if r is not None:
-            return True, {"music_result": r}
-    return False, None
-	
+​    client = AsyncHTTPClient()
+​    resp = await client.fetch("http://10.141.105.106:5858/response?query=%s" % urllib.parse.quote_plus(query))
+​    maybe_music = json.loads(resp.body.decode("utf-8"))[0] == 1
+​    if maybe_music:
+​        r = await search_qq_music(query)
+​        if r is not None:
+​            return True, {"music_result": r}
+​    return False, None
+​	
 async def main():
-    r = await check_music("周杰伦的青花瓷")
-	print ("r:", r)
+​    r = await check_music("周杰伦的青花瓷")
+​	print ("r:", r)
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-	loop.run_until_complete(main())
+​    loop = asyncio.get_event_loop()
+​	loop.run_until_complete(main())
 
 可以学习的地方：
 1. async 定义异步函数；
@@ -741,6 +739,7 @@ User gejunxiang
     url = git@intent:gejunxiang/IntentJustify.git
     fetch = +refs/heads/*:refs/remotes/origin/*
 	
+
 只有这样，git才能正确使用配置的内容。 
 
 **********************************************************************
@@ -762,11 +761,11 @@ git update-index --skip-worktree <path-name>
 **********************2018-08-30**************************************
 **********************************************************************
 一、 今天遇到python3中的编码问题，具体是这样的：
-    从xiaowei请求时，拿到的response基本是utf-8编码的，但有个别会报UnicodeDecodeError；细查后发现
-    这些response中有不合法编码（unicode的编码），导致上述错误。在查询API后发现以下解决方法：
-	response.body().decode("utf-8", errors="replace")
-	errors对应不同的处理方法，replace是针对出现unicode编码时的替换；ignore是忽略；
-	
+​    从xiaowei请求时，拿到的response基本是utf-8编码的，但有个别会报UnicodeDecodeError；细查后发现
+​    这些response中有不合法编码（unicode的编码），导致上述错误。在查询API后发现以下解决方法：
+​	response.body().decode("utf-8", errors="replace")
+​	errors对应不同的处理方法，replace是针对出现unicode编码时的替换；ignore是忽略；
+​	
 二、对于git的一个困扰是：一旦在某一次向仓库中提交一个大文件后，即便后来将其删除或者加入ignore，文件仍然会保留在历史
 记录中(.git)。如果这些文件曾被提交到服务器，会造成远程库新建时把这些记录也一并抓取，造成抓取缓慢。
 搜索过程中学到了以下有意思的指令，记录一下：
@@ -796,7 +795,7 @@ git update-index --skip-worktree <path-name>
 链接3：https://stackoverflow.com/questions/1029969/why-is-my-git-repository-so-big/1036595#1036595
 1. git gc --prune=now --aggressive
    git repack
--------------------------------------------------------------------------------------------   
+-------------------------------------------------------------------------------------------
 上述三个方法都有尝试，均未成功。最终解决问题的方案为（基本是在链接2的基础上）：
 $ git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch "shorten_tupu tree_tupu"' --prune-empty -- --all
 $ rm -rf .git/refs/original
@@ -826,7 +825,7 @@ $ git push origin master --force --all
    只有一个元素；应当每次插入时start需要new一下；
 2）使用char* 作为key，结果在find时比较的是char*也就是字符串地址而非内容，
    应当改为string输入，切记切记！
-   
+
 **********************************************************************
 **********************2018-09-07**************************************
 **********************************************************************
@@ -841,29 +840,29 @@ sed "2,$d" file
 **********************************************************************
 一、python查看第三方库版本号：
    我们可以利用  pip list 和 pip freeze命令查看所有安装包的版本号
-  
+
 二、shuf 命令
   shuf -i 1-10 -n5 #从1-10中随机取5个数
-  
+
 三、seq命令
   seq 16 #生成从1-16的数
   seq 2 3 20 #以2起始，3为间隔生成[2,20]间的数
   seq -s" " -f"str%03g" 9 11 #-s指定分隔符，-f指定输出样式, -w指定同宽
-  
+
 **********************************************************************
 **********************2018-09-13**************************************
 **********************************************************************
 python为结构或者方法增加in关键字：
 一、为结构实现in关键字有两种协议A和B，在两种方法同时存在的情况下优先使用A。
   1. 协议A: __iter__ + next
-  '''
+    '''
 	class A:
-		def __iter__(self):
-			self.limit = 4 
-			self.times = 0 
-			self.init = 1 
-			return self
-	 
+	​	def __iter__(self):
+	​		self.limit = 4 
+	​		self.times = 0 
+	​		self.init = 1 
+	​		return self
+	
 		def next(self):
 			if self.times >= self.limit:
 				raise StopIteration()
@@ -872,41 +871,42 @@ python为结构或者方法增加in关键字：
 				self.times += 1
 				self.init += 1
 				return x
-	 
+	
 	print 'A>>>>>>'
 	for x in A():
-		print x
-  '''
+	​	print x
+    '''
   2. 协议B：__getitem__ + __len__
-  '''
+    '''
 	class B:
-	 
+	
 		def __init__(self):
 			self._list = [5, 6, 7, 8]
-	 
+		 
 		def __getitem__(self, slice):
 			return self._list[slice]
-	 
+		 
 		def __len__(self):
 			return len(self._list)
-	 
+	
 	print 'B>>>>>>'
 	for x in B():
+
     print x
-  '''
-  
+    '''
+
 二、为方法实现in只需要加上yield关键字即可。
   '''
-    def C():
-		for x in range(9, 13):
-			yield x
-	 
-	print 'C>>>>>>'
-	for x in C():
-    print x
+​    def C():
+​		for x in range(9, 13):
+​			yield x
+​	 
+​	print 'C>>>>>>'
+​	for x in C():
+​	print x
 
   '''
-  
+
 **********************************************************************
 **********************2018-09-19**************************************
 **********************************************************************
@@ -914,20 +914,20 @@ python为结构或者方法增加in关键字：
   git config --global credential.helper store（只需要输入一次）
 二、yes命令
   对每个选项输入yes
-  
+
 **********************************************************************
 **********************2018-09-25**************************************
 **********************************************************************
 一、字符串编码新解(python2)
   在python2下，确实有很多字符串编码方式令人困惑，比如以下规律：
   1)任何字符串拼接，只要其中一个出现unicode，结果必为unicode；如：
-     #coding=utf-8
-     "abc" + u"def" = u"abcdef"
-	 u"def" + "abc" = u"defabc"
-	 "abc" + "def" = "abcdef"
+​     #coding=utf-8
+​     "abc" + u"def" = u"abcdef"
+​	 u"def" + "abc" = u"defabc"
+​	 "abc" + "def" = "abcdef"
   2)os.path.join()同理，只要参数中出现一个unicode编码，则结果为unicode；
   这个bug导致acmotion load_struct时出错。
-  
+
 **********************************************************************
 **********************2018-09-26**************************************
 **********************************************************************
@@ -943,7 +943,7 @@ python为结构或者方法增加in关键字：
   stable_sort: 归并排序，保持稳定性；
   partial_sort: 堆排序，对[start, end]的元素取[start, mid]的前mid-start+1个
   nth_element: 取数组中的第n个；
-  
+
 **********************************************************************
 **********************2018-09-29**************************************
 **********************************************************************
@@ -959,28 +959,28 @@ python为结构或者方法增加in关键字：
   每条斜线都是偏序的，这应该是一个很直观且容易想到的东西；
   3）问题是求解整个金字塔中第li个到第ri个数区间中所有数的和；所以第一次做这题时，
   会绕以下弯：
-    3.1）能不能做简单转换，让所有金字塔天然形成所有数排好序的序列；
-    3.2）第n个数映射到金字塔中的某个数是不是有规律，即存在n=f(i,j)，i,j是三角形坐标；
-    3.3）会不会存在s=f(li,ri)的简单关系，或者动态规划可以解决；
+​    3.1）能不能做简单转换，让所有金字塔天然形成所有数排好序的序列；
+​    3.2）第n个数映射到金字塔中的某个数是不是有规律，即存在n=f(i,j)，i,j是三角形坐标；
+​    3.3）会不会存在s=f(li,ri)的简单关系，或者动态规划可以解决；
   4）由于之前看过这题，知道以上思路行不通，很快便get到这个问题需要以下两步：
-    4.1）在偏序序列中确定li和ri的位置以及对应的数值；
-	4.2）快速计算li到ri间所有数的和；
+​    4.1）在偏序序列中确定li和ri的位置以及对应的数值；
+​	4.2）快速计算li到ri间所有数的和；
   5）想到第4步时，再稍微分析一下就会get到快速计算的key point所在：
-    5.1）金字塔中的所有数，给定位置i,j后，可以在O(1)时间计算其值。将所有的数与第一斜
-	行（从左下第一个数到右上最大的数）比较，会发现其映射关系(暂不考虑边界)：
-	        a(i, j) = a(0, i+j) - a(0, i - 1)
-	这说明，在读入数据的过程中，我们只需要计算第一斜行的值即可知道任意位置的值；
-	5.2）接下来很自然的会考虑，能不能也在O(1)的时间内计算同一个斜行上的连续序列的和呢？
-	答案是肯定的，因为同样可以将其映射到第一斜行上（暂不考虑边界）：
-	    s((i, j1) ~ (i, jn)) = s((0, i+j1) ~ (0, i+jn)) - (jn - j1) * a(0, i - 1)
-	这说明我们中需要在读入数据时再计算第一斜行从起始开始的连续和的和，再加上5.1）的连续和，
-	我们可以在O(1)时间得到某一斜行上的连续和，那么即便是累加n行，复杂度也仅是O(n)，完全可以
-	接受。
+​    5.1）金字塔中的所有数，给定位置i,j后，可以在O(1)时间计算其值。将所有的数与第一斜
+​	行（从左下第一个数到右上最大的数）比较，会发现其映射关系(暂不考虑边界)：
+​	        a(i, j) = a(0, i+j) - a(0, i - 1)
+​	这说明，在读入数据的过程中，我们只需要计算第一斜行的值即可知道任意位置的值；
+​	5.2）接下来很自然的会考虑，能不能也在O(1)的时间内计算同一个斜行上的连续序列的和呢？
+​	答案是肯定的，因为同样可以将其映射到第一斜行上（暂不考虑边界）：
+​	    s((i, j1) ~ (i, jn)) = s((0, i+j1) ~ (0, i+jn)) - (jn - j1) * a(0, i - 1)
+​	这说明我们中需要在读入数据时再计算第一斜行从起始开始的连续和的和，再加上5.1）的连续和，
+​	我们可以在O(1)时间得到某一斜行上的连续和，那么即便是累加n行，复杂度也仅是O(n)，完全可以
+​	接受。
   6）有了5的分析，很自然地会想到这种思路下问题的关键是：
-    6.1）确定第li个数的大小、位置及在每一斜行上的边界（value(li) <|<= a(i, bi)；同样的方法
-	确定ri；
-	6.2）5）中的方法计算两个边界内的数的和；
-	很显然问题的关键在6.1；
+​    6.1）确定第li个数的大小、位置及在每一斜行上的边界（value(li) <|<= a(i, bi)；同样的方法
+​	确定ri；
+​	6.2）5）中的方法计算两个边界内的数的和；
+​	很显然问题的关键在6.1；
   7）由于每个斜行序列是偏序的，很自然会想到二分查找，但怎么查找？由于所有问题都从第一斜行开始，
   于是我想到如果能知道第一斜行中每个数在整个序列中排第几，那么使用二分查找可以快速定位问题区间；
   这种想是自然的，可惜也存在了一个算法误区，这个误区在debug个过程中会提到，在此引以为戒；
@@ -997,68 +997,68 @@ python为结构或者方法增加in关键字：
   解决了；（实际上解决过程差不多，不过中间的某些步分析并不正确，因为我掉进坑里了）；
   二）然后是记忆中有印象的debug过程：
   1）首先是C代码和python的区别，句尾和括号问题，记住：
-    1.1）写代码时每一行想想要不要加分号；
-	1.2）控制流的判断句式想想要不要加括号、大括号；
-	1.3）每一个变量需要声明和初始化，并注意初始化的类型到底是什么；
-	1.4）开指针时要注意需不需要开辟空间；另外，注意传值和传引用。指针慎重。
+​    1.1）写代码时每一行想想要不要加分号；
+​	1.2）控制流的判断句式想想要不要加括号、大括号；
+​	1.3）每一个变量需要声明和初始化，并注意初始化的类型到底是什么；
+​	1.4）开指针时要注意需不需要开辟空间；另外，注意传值和传引用。指针慎重。
   2）二分查找时遇到的一些问题。没有写递归，用迭代实现二分查找，出现以下问题：
-    2.1）没有注意起始和终止的区间；我的习惯是在[start,end）左闭右开区间进行
-	二分，因此，当改动左边界时，应置start = mid + 1；否则二分查找会无限循环，
-	会犯这个错我还是太弱了。
-	2.2）注意二分查找的终止条件，while (start < end) 一般来说已经足够；不要加
-	等号；
-	2.3）注意二分查找结束时的情况；当命中某个数时，即start < end时，二分查找返回
-	的id对应的值等于该数；否则，返回id对应值必大于该数或者id==end，因为在过程中
-	始终有value(id) < value(end)（假设value(end)初始时无穷大)；而结束时start==mid
-	==end；因此，如果要查找不大于命中数的秩，当没有直接命中时应减去1，即二分查找
-	注意边界条件；
+​    2.1）没有注意起始和终止的区间；我的习惯是在[start,end）左闭右开区间进行
+​	二分，因此，当改动左边界时，应置start = mid + 1；否则二分查找会无限循环，
+​	会犯这个错我还是太弱了。
+​	2.2）注意二分查找的终止条件，while (start < end) 一般来说已经足够；不要加
+​	等号；
+​	2.3）注意二分查找结束时的情况；当命中某个数时，即start < end时，二分查找返回
+​	的id对应的值等于该数；否则，返回id对应值必大于该数或者id==end，因为在过程中
+​	始终有value(id) < value(end)（假设value(end)初始时无穷大)；而结束时start==mid
+​	==end；因此，如果要查找不大于命中数的秩，当没有直接命中时应减去1，即二分查找
+​	注意边界条件；
   3）边界条件非常重要。如果边界条件都不对，整个循环从一开始就已经错了；
-    3.1）在二分查找时，当查找不大于命中数的第一个数时，一开始没有考虑返回-1的情况；
-	3.2）当二分查找返回end - 1时，处理也和一般的处理不一致；
-	3.3）在本题中，暂时不需要处理返回end的情况，因为这不可能，但以后遇到这类问题时
-	还是要多考虑一重；
-	3.4）在考虑定位区间时，一开始考虑的非常混乱，一会左开右闭，一会左闭右开，一会
-	又左闭右闭，导致边界始终定位不清析，增加了很多debug的负担。相同序列的大小关系倒
-	是一开始就定义好的，但在处理这些边界时还是花了不少时间。以后在处理这类问题时需要
-	在一开始就定好区间的标准，出现新的边界问题上再在原来的基础上定新的标准，而不是回头
-	修改原来的标准，否则问题会绕来绕去，始终定不清楚；在定位区间的边界、计算和的边界，
-	计算和加上右边界的第一个点这个问题上都花费了不少时间；需要不断训练减少这块的失误；
+​    3.1）在二分查找时，当查找不大于命中数的第一个数时，一开始没有考虑返回-1的情况；
+​	3.2）当二分查找返回end - 1时，处理也和一般的处理不一致；
+​	3.3）在本题中，暂时不需要处理返回end的情况，因为这不可能，但以后遇到这类问题时
+​	还是要多考虑一重；
+​	3.4）在考虑定位区间时，一开始考虑的非常混乱，一会左开右闭，一会左闭右开，一会
+​	又左闭右闭，导致边界始终定位不清析，增加了很多debug的负担。相同序列的大小关系倒
+​	是一开始就定义好的，但在处理这些边界时还是花了不少时间。以后在处理这类问题时需要
+​	在一开始就定好区间的标准，出现新的边界问题上再在原来的基础上定新的标准，而不是回头
+​	修改原来的标准，否则问题会绕来绕去，始终定不清楚；在定位区间的边界、计算和的边界，
+​	计算和加上右边界的第一个点这个问题上都花费了不少时间；需要不断训练减少这块的失误；
   4）merge_array问题。
-    4.1）我清楚地记得归并排序的归并过程，有序数组A和有序数组B归并成新的有序数组只需
-	要线性的时间和空间，于是天真的我以为n个有序数组A1,A2,...,An归并成新的有序数组用
-	递归的归并也只需要O(n)时间；于是我两两归并，将归并好的新数组与下一个归并。。。这
-	样做的实际复杂度是n*A1+(n-1)*A2+···+An，亦即平方算法。
-	4.2）在一开始，我还用vector处理空间问题，实际上非常浪费时间，不断的开辟和清理空间
-	需要花费额外的时间。
-	4.3）后来改成固定的空间200000（本题最大输入量）+1，然后发现上限有可能比这个大，充裕
-	计算应该还需要乘以200；
-	4.4）这个过程中重写了归并的过程，需要注意边界条件和里边的四个循环的条件；如果是要求
-	稳定一定要注意方向，是否需要加等号；
-	4.5）make_pair的使用，make_pair产生的判别对可以直接push进vector，也可以直接赋值，还
-	可以直接进行比较，使用less<pair<int, int> >()函数，相当好用；
+​    4.1）我清楚地记得归并排序的归并过程，有序数组A和有序数组B归并成新的有序数组只需
+​	要线性的时间和空间，于是天真的我以为n个有序数组A1,A2,...,An归并成新的有序数组用
+​	递归的归并也只需要O(n)时间；于是我两两归并，将归并好的新数组与下一个归并。。。这
+​	样做的实际复杂度是n*A1+(n-1)*A2+···+An，亦即平方算法。
+​	4.2）在一开始，我还用vector处理空间问题，实际上非常浪费时间，不断的开辟和清理空间
+​	需要花费额外的时间。
+​	4.3）后来改成固定的空间200000（本题最大输入量）+1，然后发现上限有可能比这个大，充裕
+​	计算应该还需要乘以200；
+​	4.4）这个过程中重写了归并的过程，需要注意边界条件和里边的四个循环的条件；如果是要求
+​	稳定一定要注意方向，是否需要加等号；
+​	4.5）make_pair的使用，make_pair产生的判别对可以直接push进vector，也可以直接赋值，还
+​	可以直接进行比较，使用less<pair<int, int> >()函数，相当好用；
   5）当意识到merge_array的算法复杂度不对时，首先想到用快排解决，然后又进入了好多坑：
-    5.1）其实这一次写快排我写的还是挺正确的，需要注意的是排序的不是int，而是pair，注意
-	初始赋值和最终的值要返还给结束时秩所对应的值时就行；
-	5.2）上面其实并非我遇到的坑，坑的地方在于：我默认相同的数，右边斜行的数大于左边，因此
-	返回的第k大数跟其位置也是息息相关的；因为一开始使用归并，数列的稳定性可以保持，所以返回
-	的第k大数是正确的，改为快排后，第k大数实际上不对的，因为快排会改变序列的稳定性！！！！
-	因为没想到这一点，我debug了很久，虽然很快定位到快排出错，但并没有考虑到是稳定性的问题，
-	一直以为是自己好久没写C++代码了，连快排都不会写了，于是我看了n*n遍快排，还是没能看出快排
-	到底哪里写错了（哎，根本不是快排写错了好嘛，是快排本身就不能用在这好嘛！）。真的花了好多
-	时间在这个地方debug；后来发现是稳定性的问题是这样子的，在网上查找sort函数的说明，发现了
-	昨天记的nth_element的stl函数，替换掉快排的那一行代码后，结果在小数据集上又重归正确了；这样
-	一分析，结合归并时结果也是正确的情况，我才一下子意识到稳定性的问题。
-	在此形成意识，排序时对稳定性要形成意识，一个问题需不需要保持其稳定性，这是很重要的思考点，
-	切记切记！
-	5.3）然后就是nth_element函数了，新学到的，以及less<pair <int, int> >()这个函数，以及pair可以
-	直接比较这些新知识点；
+​    5.1）其实这一次写快排我写的还是挺正确的，需要注意的是排序的不是int，而是pair，注意
+​	初始赋值和最终的值要返还给结束时秩所对应的值时就行；
+​	5.2）上面其实并非我遇到的坑，坑的地方在于：我默认相同的数，右边斜行的数大于左边，因此
+​	返回的第k大数跟其位置也是息息相关的；因为一开始使用归并，数列的稳定性可以保持，所以返回
+​	的第k大数是正确的，改为快排后，第k大数实际上不对的，因为快排会改变序列的稳定性！！！！
+​	因为没想到这一点，我debug了很久，虽然很快定位到快排出错，但并没有考虑到是稳定性的问题，
+​	一直以为是自己好久没写C++代码了，连快排都不会写了，于是我看了n*n遍快排，还是没能看出快排
+​	到底哪里写错了（哎，根本不是快排写错了好嘛，是快排本身就不能用在这好嘛！）。真的花了好多
+​	时间在这个地方debug；后来发现是稳定性的问题是这样子的，在网上查找sort函数的说明，发现了
+​	昨天记的nth_element的stl函数，替换掉快排的那一行代码后，结果在小数据集上又重归正确了；这样
+​	一分析，结合归并时结果也是正确的情况，我才一下子意识到稳定性的问题。
+​	在此形成意识，排序时对稳定性要形成意识，一个问题需不需要保持其稳定性，这是很重要的思考点，
+​	切记切记！
+​	5.3）然后就是nth_element函数了，新学到的，以及less<pair <int, int> >()这个函数，以及pair可以
+​	直接比较这些新知识点；
   6）还是边界问题，重新说下计算连续和时的几个边界：
-    6.1）考虑右边界小于左边界的问题，这种情况其实不存在，但为了鲁棒和习惯还是加上了；
-	6.2）一开始没考虑到要加上右边界的那个值，所以没考虑确定第ri个数所在位置的问题，后来加上了；
-	6.3）考虑left和right和0的问题；
-	6.4）考虑是否第一斜行(rank == 0)的问题；
-	6.5）考虑加上第ri个数的问题；
-	6.6）考虑相对于第一斜行的数值偏移问题；
+​    6.1）考虑右边界小于左边界的问题，这种情况其实不存在，但为了鲁棒和习惯还是加上了；
+​	6.2）一开始没考虑到要加上右边界的那个值，所以没考虑确定第ri个数所在位置的问题，后来加上了；
+​	6.3）考虑left和right和0的问题；
+​	6.4）考虑是否第一斜行(rank == 0)的问题；
+​	6.5）考虑加上第ri个数的问题；
+​	6.6）考虑相对于第一斜行的数值偏移问题；
   7）debug到这个地步时，小测试样本(small.in)已经能输出正确的结果，测试通过，而且发现时间也挺快的；
   于是我以为算法就是nlogn没问题了，然后发现跑大样本需要几个小时，但此时我还是没考虑到是复杂度出错
   的问题，以为算法仍然是nlogn。这个时候报了个段错误(segment fault)，然后发现是merge_array的地方，
@@ -1109,7 +1109,7 @@ python为结构或者方法增加in关键字：
   4）熟练掌握一些常用算法的编写，做到不出错，并清楚这些算法的边界和使用范围、限制，比如快排就是不稳定算法，当需要稳定
   性时绝不能使用等等；二分查找出来的边界需不需要再加减1等等；
   5）long long问题要重视，每一次数据的定义都尽量分析是否存在错误。
-  
+
 **********************************************************************
 **********************2018-09-30**************************************
 **********************************************************************
@@ -1123,14 +1123,14 @@ python为结构或者方法增加in关键字：
   3.2）代码确实按思路写了，但跑出来的结果始终不能通过；这时候我陷入了一个思维深渊，无从入手，不断地试数字也不知道
   哪错了；花费了不少时间才发现，我记录最高位奇数位数值last_bit没做对，导致结果在2098类似的数时输出依然是2，坑啊，
   类似的错误确实很难调试。如果出现类似问题，以后要多加debug信息了。保持思路清晰必须很重要啊。
-  
+
 **********************************************************************
 **********************2018-10-08**************************************
 **********************************************************************
 一、linux增加用户名，指定目录，设定密码：
   useradd|adduser -d /search/odin/open open
   passwd open
-  
+
 **********************************************************************
 **********************2018-10-08**************************************
 **********************************************************************
@@ -1144,14 +1144,14 @@ python为结构或者方法增加in关键字：
   1) cat t | colrm 4 6 删除文件t中第4列到第六列的字符
   2) comm -123 file1 file2 比较文件差异，第三列放两个文件共同数据；
   3) split & csplit (后者支持更加复杂的模式)
-    3.1) split [-3|-l 3](分隔文件每个多少行) [-b 8|-C 8](分隔文件每个多少字节) file prefix
-	3.2) csplit -f prefix -n3(数字部分指定位数) -b "%02d.log"(指定后缀格式) [-s|-q](静默模式) -k(异常也输出) -z(删除
-	空文件) file pattern
-	pattern范例:
-	i) csplit file 100 (在第100行分割一次)
-	ii) csplit file 11 22 44 100 (在指定行数各进行一次分割)
-	iii) csplit file 100 {*} (每隔100行分割一次)
-	iv) csplit file /Part / {*} (每遇到Part分割一次)
+​    3.1) split [-3|-l 3](分隔文件每个多少行) [-b 8|-C 8](分隔文件每个多少字节) file prefix
+​	3.2) csplit -f prefix -n3(数字部分指定位数) -b "%02d.log"(指定后缀格式) [-s|-q](静默模式) -k(异常也输出) -z(删除
+​	空文件) file pattern
+​	pattern范例:
+​	i) csplit file 100 (在第100行分割一次)
+​	ii) csplit file 11 22 44 100 (在指定行数各进行一次分割)
+​	iii) csplit file 100 {*} (每隔100行分割一次)
+​	iv) csplit file /Part / {*} (每遇到Part分割一次)
 
 二、判断最长回文字符串有O(n)的方法，记住这个方法；
 
@@ -1167,7 +1167,7 @@ python为结构或者方法增加in关键字：
   总结下发现了这个特点；
   3）但光这点不够，统计交集不可能将包含9的数全都判断一遍是否和能被9整除；
   时间复杂度不允许，需要进一步的统计；于是我发现，如果依次考虑Pattern：
-          [bef]9[0-8]+
+​          [bef]9[0-8]+
   bef表示所有可允许的前缀，9表示当前判断的位置填9，[0-8]+表示在此位之后所有
   的数字填0-8之间的数字，如此，因为0-8包含mod 9后的所有数，当最后一位之前的
   所有数确定之后，最后一位只有一种可能能够满足被9整除，而依次按位数判断，则
@@ -1181,116 +1181,133 @@ python为结构或者方法增加in关键字：
   清晰。另外，像这种L和R的左右区间问题，第一时间想想能不能[0, R], [0, L]解决也
   是一种好方法。
   6）后期遇到几个小细节注意一下：
-    6.1）pow(9, 18)函数出界，以后long long时慎用，可以自己写get_pow函数替代求和；
-	6.2）long long时还要注意；
-	6.3）c++转换字符串时要注意在最后加上休止符'\0'。
-=======
+6.1）pow(9, 18)函数出界，以后long long时慎用，可以自己写get_pow函数替代求和；
+6.2）long long时还要注意；
+
+6.3）c++转换字符串时要注意在最后加上休止符'\0'。
+
 **********************2018-10-16**************************************
+
 **********************************************************************
 一、kickstart/ScrambleWords总结：
-    这是一道想了很久的问题，断断续续想了一周，始终在考虑能不能在线性或者
-	nlogn的时间内解决。今天看了下网上解决人的做法，才发现自己或许进了一个
-	误区。
-	下载了三个人的解决方案，他们的算法大同小异，都是用我一开始就能想到的
-	M*N的平方算法逻辑，加上现成的数据结构完成任务。初步估计了下，他们的
-	算法复杂度应该是M*sqrt(N)，至少第一个人的应该是这样，运算次数在3亿次以
-	上。第一个人的方案运行时间总共是10多分钟。
-	这时我才意识到，因为是应试的角度，即使一个算法没有达到复杂度上的最优，
-	但只要能在考试时间内跑出来并给出结果，就可以了。虽然心里有点小失落，想
-	了许久的题没有找到nlogn以内的算法，但也无疑让我学到了这点应试小技巧。
-	总结一些他们算法给我的启发：
-	1）Mister的做法很简单也很有启发性: Hash编码+遍历搜索，算法主要难点在于
-	一定要保证Hash编码的唯一性和正确性，即对应字符串生成的Hash编码也必须是一
-	样的(对应是指按题目要求，两端一样，中间的字母组合必须一致但顺序可以乱），
-	不同字符串HashCode一定不一致。为保证这点，他使用了64位随机数产生库：
-	                     mt19937_64 rng(24);
-	这是C++11可以用的随机数<random>库中的函数，产生一个64位的随机大数。对头和
-	尾以及每一个字母(a-z)产生一个对应的随机码，计算hashcode时对字符串连加就可
-	以了。搜索的时候按字符串长度搜索，将相同长度的字符串组织成一个vector，对
-	字符串长度-待匹配字符串长度、字符串长度-当前长度的所有字符串进行一次遍历。
-	2）jocobitpl的思路与前者几乎是一致的，他生成的唯一编码是用模余方法实现的：
-	Base是1299827ll，模数是1000000007ll。他将数据组织成multimap的方式，即允许
-	键值key重复，与Mister其实差不多，只是可以在查到之后方便地删除这个key。search
-	的时候仍然是遍历。
-	3）wcwswswws的做法也差不多，他的唯一标识码是最自然的思路，直接用首末以及中间
-	的数组唯一代表这个序列，数据是用三个逐层嵌套的vector，最里层一个unordered_map
-	实现的。
-	4）总结来说，这三个人的做法并没有从算法层面带来什么启发，但他们组织和使用的数据
-	结构值得我学习，他们都使用了c++11中的标准函数，我之前用的少。比如:
-	4.1) mt19934_64随机数生成库；
-	4.2）auto关键字替代复杂的iterator的书写；
-	4.3）for (string s : words[len]) 让我第一次感觉c++有点python的意思了；
-	4.4) 各种集成好的高级数据库的使用:unordered_set/map,multimap等等。
-	
+​    这是一道想了很久的问题，断断续续想了一周，始终在考虑能不能在线性或者
+​	nlogn的时间内解决。今天看了下网上解决人的做法，才发现自己或许进了一个
+​	误区。
+​	下载了三个人的解决方案，他们的算法大同小异，都是用我一开始就能想到的
+​	M*N的平方算法逻辑，加上现成的数据结构完成任务。初步估计了下，他们的
+​	算法复杂度应该是M*sqrt(N)，至少第一个人的应该是这样，运算次数在3亿次以
+​	上。第一个人的方案运行时间总共是10多分钟。
+​	这时我才意识到，因为是应试的角度，即使一个算法没有达到复杂度上的最优，
+​	但只要能在考试时间内跑出来并给出结果，就可以了。虽然心里有点小失落，想
+​	了许久的题没有找到nlogn以内的算法，但也无疑让我学到了这点应试小技巧。
+​	总结一些他们算法给我的启发：
+​	1）Mister的做法很简单也很有启发性: Hash编码+遍历搜索，算法主要难点在于
+​	一定要保证Hash编码的唯一性和正确性，即对应字符串生成的Hash编码也必须是一
+​	样的(对应是指按题目要求，两端一样，中间的字母组合必须一致但顺序可以乱），
+​	不同字符串HashCode一定不一致。为保证这点，他使用了64位随机数产生库：
+​	                     mt19937_64 rng(24);
+​	这是C++11可以用的随机数<random>库中的函数，产生一个64位的随机大数。对头和
+​	尾以及每一个字母(a-z)产生一个对应的随机码，计算hashcode时对字符串连加就可
+​	以了。搜索的时候按字符串长度搜索，将相同长度的字符串组织成一个vector，对
+​	字符串长度-待匹配字符串长度、字符串长度-当前长度的所有字符串进行一次遍历。
+​	2）jocobitpl的思路与前者几乎是一致的，他生成的唯一编码是用模余方法实现的：
+​	Base是1299827ll，模数是1000000007ll。他将数据组织成multimap的方式，即允许
+​	键值key重复，与Mister其实差不多，只是可以在查到之后方便地删除这个key。search
+​	的时候仍然是遍历。
+​	3）wcwswswws的做法也差不多，他的唯一标识码是最自然的思路，直接用首末以及中间
+​	的数组唯一代表这个序列，数据是用三个逐层嵌套的vector，最里层一个unordered_map
+​	实现的。
+​	4）总结来说，这三个人的做法并没有从算法层面带来什么启发，但他们组织和使用的数据
+​	结构值得我学习，他们都使用了c++11中的标准函数，我之前用的少。比如:
+​	4.1) mt19934_64随机数生成库；
+​	4.2）auto关键字替代复杂的iterator的书写；
+​	4.3）for (string s : words[len]) 让我第一次感觉c++有点python的意思了；
+​	4.4) 各种集成好的高级数据库的使用:unordered_set/map,multimap等等。
+​	
+
 **********************************************************************
 **********************2018-10-23**************************************
 **********************************************************************
 一、tornado.options.parse_command_line()函数会默认为我们配置标准logging
-    模块，即默认开启了日志功能，并向标准输出（屏幕）打印日志信息。如果
-	想关闭tornado默认的日志功能，代码中该句之前添加：
-	options.logging = None
-	options.parse_command_line()
-	
+​    模块，即默认开启了日志功能，并向标准输出（屏幕）打印日志信息。如果
+​	想关闭tornado默认的日志功能，代码中该句之前添加：
+​	options.logging = None
+​	options.parse_command_line()
+​	
 **********************************************************************
 **********************2018-10-24**************************************
 **********************************************************************
 一、linux命令ab测试服务器性能
   ab -c 5 -n 5 http://10.141.105.106:8787/?query=xxx(-c指定并发数，-n指定用户数)
-  
+
 **********************************************************************
 **********************2018-10-25**************************************
+
 **********************************************************************
 一、安装python3.x(python3.6为例)的简单方法(yum直接安装):
+
+```
   yum -y install https://centos7.iuscommunity.org/ius-release.rpm; 
   yum -y install python36u python36u-devel
   wget https://bootstrap.pypa.io/get-pip.py
   python3.6 get-pip.py(或者yum install python36u-pip -y)
+```
+
+
 二、rpm打包方法学习：
-  宏列表：
-	%{_sysconfdir}        /etc
-	%{_prefix}            /usr
-	%{_exec_prefix}       %{_prefix}
-	%{_bindir}            %{_exec_prefix}/bin
-	%{_libdir}            %{_exec_prefix}/%{_lib}
-	%{_libexecdir}        %{_exec_prefix}/libexec
-	%{_sbindir}           %{_exec_prefix}/sbin
-	%{_sharedstatedir}    /var/lib
-	%{_datarootdir}       %{_prefix}/share
-	%{_datadir}           %{_datarootdir}
-	%{_includedir}        %{_prefix}/include
-	%{_infodir}           /usr/share/info
-	%{_mandir}            /usr/share/man
-	%{_localstatedir}     /var
-	%{_initddir}          %{_sysconfdir}/rc.d/init.d
-	%{_var}               /var
-	%{_tmppath}           %{_var}/tmp
-	%{_usr}               /usr
-	%{_usrsrc}            %{_usr}/src
-	%{_lib}               lib (lib64 on 64bit multilib systems)
-	%{_docdir}            %{_datadir}/doc
-	%{buildroot}          %{_buildrootdir}/%{name}-%{version}-%{release}.%{_arch}
+
+```
+宏列表：
+	%{sysconfdir}        /etc
+	%{prefix}            /usr
+	%{exec_prefix}       %{prefix}
+	%{bindir}            %{exec_prefix}/bin
+	%{libdir}            %{exec_prefix}/%{lib}
+	%{libexecdir}        %{exec_prefix}/libexec
+	%{sbindir}           %{exec_prefix}/sbin
+	%{sharedstatedir}    /var/lib
+	%{datarootdir}       %{prefix}/share
+	%{datadir}           %{datarootdir}
+	%{includedir}        %{prefix}/include
+	%{infodir}           /usr/share/info
+	%{mandir}            /usr/share/man
+	%{localstatedir}     /var
+	%{initddir}          %{sysconfdir}/rc.d/init.d
+	%{var}               /var
+	%{tmppath}           %{var}/tmp
+	%{usr}               /usr
+	%{usrsrc}            %{usr}/src
+	%{lib}               lib (lib64 on 64bit multilib systems)
+	%{docdir}            %{datadir}/doc
+	%{buildroot}          %{buildrootdir}/%{name}-%{version}-%{release}.%{arch}
 	$RPM_BUILD_ROOT       %{buildroot}
   rpm build目录：
-	!/rpmbuild				%_topdir		顶层目录			
-    ~/rpmbuild/SPECS		%_specdir		Spec 文件目录		保存 RPM 包配置（.spec）文件
-	~/rpmbuild/SOURCES		%_sourcedir		源代码目录			保存源码包（如 .tar 包）和所有 patch 补丁
-	~/rpmbuild/BUILD		%_builddir		构建目录			源码包被解压至此，并在该目录的子目录完成编译
-	~/rpmbuild/BUILDROOT	%_buildrootdir	最终安装目录		保存 %install 阶段安装的文件
-	~/rpmbuild/RPMS			%_rpmdir		标准 RPM 包目录		生成/保存二进制 RPM 包
-	~/rpmbuild/SRPMS		%_srcrpmdir		源代码 RPM 包目录	生成/保存源码 RPM 包(SRPM)
+	!/rpmbuild				%topdir		顶层目录			
+    ~/rpmbuild/SPECS		%specdir		Spec 文件目录		保存 RPM 包配置（.spec）文件
+	~/rpmbuild/SOURCES		%sourcedir		源代码目录			保存源码包（如 .tar 包）和所有 patch 补丁
+	~/rpmbuild/BUILD		%builddir		构建目录			源码包被解压至此，并在该目录的子目录完成编译
+	~/rpmbuild/BUILDROOT	%buildrootdir	最终安装目录		保存 %install 阶段安装的文件
+	~/rpmbuild/RPMS			%rpmdir		标准 RPM 包目录		生成/保存二进制 RPM 包
+	~/rpmbuild/SRPMS		%srcrpmdir		源代码 RPM 包目录	生成/保存源码 RPM 包(SRPM)
   rpm 隐藏文件(~/.rpmmacros)，可以定义在当前工程下，可以定义系统变量，当前工程生效：
-	%_topdir       /home/ambari/rpm
+	%topdir       /home/ambari/rpm
 	%_tmppath      /home/ambari/rpm/tmp
+```
+
+
 
 **********************************************************************
 **********************2018-10-31**************************************
 **********************************************************************
 一、Centos搭建ftp服务器
-	yum install -y vsftpd 
+​	yum install -y vsftpd 
 
 二、docker修改默认配置路径： /etc/docker/daemon.json
-	docker文档及安装：https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
-    docker卸载：sudo yum remove docker \
+​	docker文档及安装：https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
+​    docker卸载：
+
+```
+  sudo yum remove docker \
 					docker-client \
 					  docker-client-latest \
 					  docker-common \
@@ -1300,74 +1317,85 @@ python为结构或者方法增加in关键字：
 					  docker-selinux \
 					  docker-engine-selinux \
 					  docker-engine
-					  
+```
+
+​					  
+
 **********************************************************************
 **********************2018-11-01**************************************
+
 **********************************************************************
 一、docker安装nvidia-docker问题及为使用tensorflow-gpu for docker：
-	参照nvidia-docker的git文档使用下列脚本安装:
-	# If you have nvidia-docker 1.0 installed: we need to remove it and all existing GPU containers
-	docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
-	sudo yum remove nvidia-docker
+​	参照nvidia-docker的git文档使用下列脚本安装:
+​	# If you have nvidia-docker 1.0 installed: we need to remove it and all existing GPU containers
+​	docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
+​	sudo yum remove nvidia-docker
 
 	# Add the package repositories
 	distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 	curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | \
 	  sudo tee /etc/yum.repos.d/nvidia-docker.repo
-
+	
 	# Install nvidia-docker2 and reload the Docker daemon configuration
 	sudo yum install -y nvidia-docker2
 	sudo pkill -SIGHUP dockerd
-
+	
 	# Test nvidia-smi with the latest official CUDA image
 	docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi	
-	遇到/etc/docker/daemon.json无法创建的问题，查找许久未发现原因，最后定位是docker版本太低导致的；
-	机器上装的是docker_18.06.0，重装docker_18.06.1，问题解决。
-	以下测试安装并验证nvidia-docker和nvidia/cuda：
-	docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
-	
+
+遇到/etc/docker/daemon.json无法创建的问题，查找许久未发现原因，最后定位是docker版本太低导致的；
+机器上装的是docker_18.06.0，重装docker_18.06.1，问题解决。
+以下测试安装并验证nvidia-docker和nvidia/cuda：
+
+```docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi```
+
 二、requests问题：
-    requests包是很多其他包依赖的软件，使用pip uninstall requests并无法删除干净该包，因此也不能直接
-	使用pip install --upgrade requests的方法进行升级。需要从源码安装升级。
-	1）删除现有目录：rm -rf /usr/lib/python2.7/site-packages/requests
-	2) git clone git://github.com/kennethreitz/requests.git
-	3) cd requests && python setup.py install
-	在import requests时仍然遇到urllib3的import问题，使用：
-	pip install --upgrade urllib3
-	解决
-	
-	
-**********************************************************************
-**********************2018-11-07**************************************
-**********************************************************************
+​    requests包是很多其他包依赖的软件，使用pip uninstall requests并无法删除干净该包，因此也不能直接
+​	使用pip install --upgrade requests的方法进行升级。需要从源码安装升级。
+​	1）删除现有目录：rm -rf /usr/lib/python2.7/site-packages/requests
+​	2) git clone git://github.com/kennethreitz/requests.git
+​	3) cd requests && python setup.py install
+​	在import requests时仍然遇到urllib3的import问题，使用：
+​	pip install --upgrade urllib3
+​	解决
+
+## 2018-11-07
+
 一、c++ 11新特性总结:
-    1）nullptr:	区别NULL和0出现。当需要使用 NULL 时候，养成直接使用 nullptr的习惯。
-	2）auto关键字和decltype关键字，分别对变量和表达式自动进行类型推导；
-	3）for循环的简单化: for(auto &i: arr);
-	4) 初始化列表： vector<int> a = {1, 3, 5, 7, 9};
-	5) 模板增加： 
-	   5.1）vector<vector<int>>合法；
-	   5.2）默认模板template<typename T=int, typename U=int>
-	   5,3）模板别名：template<typename T>
-	                  using NewType = SuckType<int, T, 1>;	
-	6）类继承：
-	   struct B : A {
-	        using A::A;
-	   }
-	7) lambda表达式：
-		[capture[ , =, &]](params) opt[mutable] -> ret { body; }
-		int a = 0;
-		auto f = [&a] { return a;
-		lambad与STL函数的结合使用：
-		int value = 3;
-		vector<int> v {1, 3, 5, 2, 6, 10};
-		int count = std::count_if(v.beigin(), v.end(), [value](int x) { return x > value; });
-		还有generate, for_each;
-	8) 新增容器：
-	     array, forward_list, unordered系列，
-		 tuple：三个核心接口：make_tuple | get | tie;
-    9) 正则表达式：
-	    std::regex base_regex("([a-z]+)\\.txt");
+​    1）nullptr:	区别NULL和0出现。当需要使用 NULL 时候，养成直接使用 nullptr的习惯。
+​	2）auto关键字和decltype关键字，分别对变量和表达式自动进行类型推导；
+​	3）for循环的简单化: for(auto &i: arr);
+​	4) 初始化列表： vector<int> a = {1, 3, 5, 7, 9};
+​	5) 模板增加： 
+​	   5.1）vector<vector<int>>合法；
+​	   5.2）默认模板template<typename T=int, typename U=int>
+​	   5,3）模板别名：template<typename T>
+​	                  using NewType = SuckType<int, T, 1>;	
+​	6）类继承：
+​	   struct B : A {
+​	        using A::A;
+​	   }
+​	7) lambda表达式：
+
+```		[capture[ , =, &]](params) opt[mutable] -> ret { body; }   ```
+
+```c++
+int a = 0;
+auto f = [&a] { return a; }
+# lambda与STL函数的结合使用：
+int value = 3;
+vector<int> v {1, 3, 5, 2, 6, 10};
+int count = std::count_if(v.beigin(), v.end(), [value] { return x > value; });
+```
+
+还有generate, for_each;
+​	8) 新增容器：
+​	     array, forward_list, unordered系列，
+​		 tuple：三个核心接口：make_tuple | get | tie;
+​    9) 正则表达式：
+
+```c++
+    std::regex base_regex("([a-z]+)\.txt");
 		std::smatch base_match;
 		for(const auto &fname: fnames) {
 			if (std::regex_match(fname, base_match, base_regex)) {
@@ -1380,4 +1408,12 @@ python为结构或者方法增加in关键字：
 				}
 			}
 		}
-  
+```
+
+## 2018-11-13
+
+### 一. Kickstart教训：
+
+​       刷CaveEscape方法时遇到的，使用深度优先加层级搜索解决了问题，但无论怎么提交都报错，完全不知道bug所在，折腾了一天后才知道，居然是提交了错误目录的文件！！！看来我还是不够细心严谨，有时候考虑问题真得从源头、从最高层考虑出错所在。谨记谨记！
+
+​	
