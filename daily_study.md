@@ -1417,3 +1417,71 @@ int count = std::count_if(v.beigin(), v.end(), [value] { return x > value; });
 ​       刷CaveEscape方法时遇到的，使用深度优先加层级搜索解决了问题，但无论怎么提交都报错，完全不知道bug所在，折腾了一天后才知道，居然是提交了错误目录的文件！！！看来我还是不够细心严谨，有时候考虑问题真得从源头、从最高层考虑出错所在。谨记谨记！
 
 ​	
+
+## 2018-11-16
+
+### 一、python类重载运算符：
+
+#### 1. get和set方法（property）：
+
+```python
+class Person(object):
+
+    def __init__(self):
+        self._age = None
+
+    @property
+    def age(self):
+        return self._age
+
+    @age.setter
+    def age(self,age):
+        if isinstance(age,str):
+            self._age = int(age)
+        elif isinstance(age,int):
+            self._age = age
+
+    @age.deleter
+    def age(self):
+        del self._age
+
+p = Person()
+p.age = "18"
+print p.age #18
+del p.age
+print p.age #报错,AttributeError: 'Person' object has no attribute '_age'
+```
+
+#### 2. 基本运算符重载：
+
+| Method                                                | Overloads | Call for |
+| ----------------------------------------------------- | --------- | -------- |
+| \__init__                                             |           |          |
+| \__del__                                              |           |          |
+| \__add__/__sub__                                      |           |          |
+| \__or__                                               |           |          |
+| _repr__／__str__                                      |           |          |
+| \__call__                                             |           |          |
+| \__getattr__                                          |           |          |
+| \__setattr__                                          |           |          |
+| \__delattr__                                          |           |          |
+| \__getattribute__                                     |           |          |
+| \__getitem__                                          |           |          |
+| \__setitem__                                          |           |          |
+| \___lt\__, \__gt\__, \__le\__,\__ge\__,__eq__, __ne__ |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+|                                                       |           |          |
+
+
+
+
+
