@@ -1,4 +1,5 @@
-﻿//2017-07-24
+﻿## 2017-07-24
+
 awk命令：
 awk -F "\t" '{print $1}' wenda_1_1.gbk | head
 iconv命令：
@@ -6,38 +7,45 @@ iconv -f utf-8 -t gb18030 wenda_1_1.utf8 > wenda_1_1.gbk
 sort命令：
 sort -k1,1n sim.txt.seg 
 
-//2017-07-24
-1.hydoop学习：mapper/reducer
-  streaming架构
-2. url编码
-   query = urllib.unquote(query) 
-   query = query.decode("gbk", "ignore")
+## 2017-07-24
 
-//2017-07-27
+### 1.hydoop学习：mapper/reducer
+
+  streaming架构
+
+#### url编码
+
+query = urllib.unquote(query) 
+query = query.decode("gbk", "ignore")
+
+## 2017-07-27
+
 dos2unix test_20170728_1.txt  // 将windows系统下的txt文本中的换行符转换成unix系统中的换行符
 nohup ./chatbot_test.py test_20170728_1.txt output_20170728.txt wechat > log & // nohup 后台运行进程
 ps aux  // 进程控制和显示
 kill 。。。 // 杀死相关进程
 grep 命令  // 可依据正则表达式显示相关文件
 
-//2017-07-31
+##2017-07-31
 debug: baike_percent.py脚本，import chatdet时，本地运行可行，上传hadoop出错，原因是集群里没有chatdet包
 
 reducer的原理：
 
 print xx,xx输出时，是用空格分开的
 
-//2017-08-02
+## 2017-08-02
+
 awk函数进阶，过滤
 grep函数进阶
 比较命令vimdiff, svn log
 最终整理的排序结果中前一段有很多数字，需要进行过滤
 
-//2017-08-03
+## 2017-08-03
+
 paste 粘贴两个文件（同行）
 wc 查看文件字节数、行数
 
-//2017-08-04
+##2017-08-04
 python中多断式的用法
 dict([itm.split('="') if len(itm.split('="    ')) == 2 
 else (itm, '') for itm in rank_str.replace('<rank ',     '')
@@ -49,28 +57,33 @@ STR1 = "abc"(错误写法)
 STR1="abc"(正确写法)
 不能有空格
 
-if[$STR1=$STR2](错误写法)
+if \[\$STR1=\$STR2](错误写法)
 
-if [ $STR1 = $STR2 ](正确写法)
+if \[ \$STR1 = $STR2 ](正确写法)
 
 awk命令 length($1)可直接获取字符串的长度
 
-// 2017-08-07
+## 2017-08-07
+
 1.grep命令 grep 'xx\|xx\|xx' 不能少了转义符，不然不能多个义项进行选择
 2.python 中的in, 单个项在词典和列表是否存在可以直接用in，单个字母在字符串中的判断也可以使用，一串字符是否在另一串
   字符中使用findt
+
 3. 中文字符用in判断时出现bug：Non-ASCII character '\xe5' in file
   解决方法在行首添加#coding=utf-8后，可以使用中文字符编码用in
 
-// 2017-08-10
+## 2017-08-10
+
 Ctrl+w 切换窗口(vim）
 
-// 2017-08-16
+## 2017-08-16
+
 pdb.set_trace()  // 单步调试
 awk -F '\t' '{print $2}' bank_result.txt  | sort | uniq > bank-urls& 
 uniq -c testfile // 删除出现重复的行数
 
-// 2017-08-21
+## 2017-08-21
+
 cd - // 返回上一个（非上一级）目录
 AttributeError: 'Worksheet' object has no attribute 'nrows' // xlrd有该属性，xlwt没有，需要自己计算行数
 搜狗放炮哥是谁 在本地测试和集群测试的结果不一致 // get_yaoting的参数query需要作为
@@ -93,8 +106,9 @@ svn checkout|co svn全路径 本地全路径（默认当前目录）
 svn add *.php ＜－ 添加当前目录下所有的php文件
 svn commit -m “添加我的测试用全部php文件“ *.php
 
-// 2017-08-17
+## 2017-08-17
 ??? Ques: 搜狗汪仔客户端和本地测试不一致，如下列问题：
+
 1. 鲁豫那么瘦是为什么
 2. 冯小刚的第一部影片是哪部
 3. 刘德华是四大天王之一么
@@ -118,7 +132,7 @@ svn　ci　-m　“删除备注信息文本”//进行备注说明
 svn　lock　-m　“加锁备注信息文本“　[--force]　文件名 // 对文件进行上锁
 svn　unlock　文件名 // 解锁
 
-// 2017-08-17
+## 2017-08-17
 svn命令学习
 svn　diff　文件名 
 svn　diff　-r　修正版本号m:修正版本号n　文件名 // 比较两个文件的差异
@@ -128,7 +142,7 @@ svn st // 显示目录下的文件和子目录状态
 
 svn log 文件名 // 显示这个文件的所有修改记录，及其版本号变化
 
-// 2017-08-18
+## 2017-08-18
 svn命令学习
 svn list svn://localhost/test  // 查看版本目录下的全部文件和子目录列表
 
@@ -137,10 +151,12 @@ svn mkdir -m "Making a new dir." svn://localhost/test/newdir
 
 svn　revert　[--recursive]　文件名 // 丢弃对一个文件的修改，加上参数后为对目录的操作
 
-// 2017-09-04
+## 2017-09-04
+
 lsof -i:9200 // 查看端口号
 
-// 2017-09-07
+## 2017-09-07
+
 tar -zcvf 压缩后文件名 要压缩的文件或者目录
 tar -zxvf 待解压文件 -C 要解压到的目录
 xlwt的超链接读写操作:
@@ -149,22 +165,21 @@ sheet.write(
 ​    Formula('HYPERLINK("http://www.python.org";"Python")'),
 ​    style)
 
-// 2017-09-08
+## 2017-09-08
+
 lambda关键字：sorted(list, key = lambda student: (-x[1], x[0]))
 map(f, list) // map函数
 zip() //zip函数 
 注意深度学习的交叉验证训练
 
-**********************************************************************
-**********************2017-09-09**************************************
-**********************************************************************
+## 2017-09-09
+
 每天一个linux命令：
 chattr +a|i 文件名称
 lsattr 文件目录 
 
-**********************************************************************
-**********************2017-09-15**************************************
-**********************************************************************
+## 2017-09-15
+
 libboost安装问题：
 在运行skill-platform中的platform_server.py时，一直提示：
 找不到libboost_python3.so.1.64.0，因此，从源代码编译boost_python。
@@ -178,9 +193,8 @@ libboost安装问题：
 7.运行./b2 install //这一步是将库加入/usr/local目录，很关键
 以上，完成libboost_python3.so.1.64.0的编译
 
-**********************************************************************
-**********************2017-09-15**************************************
-**********************************************************************
+##2017-09-15
+
 vim命令：
 f命令用于行内快速查找，fx定位于本行本字符后的x字符上，
 t命令同上
@@ -197,15 +211,13 @@ done
 web search问题：海贼王的作者是谁
 回答出现了符号：》《尾田荣一郎...
 
-**********************************************************************
-**********************2017-09-15**************************************
-**********************************************************************
+##2017-09-15
+
 linux去重：
 sort -u 文件名 > 新文件名 // 注意导向符不可缺，否则不对原文件进行操作
 
-**********************************************************************
-**********************2017-09-26**************************************
-**********************************************************************
+##2017-09-26
+
 awk命令学习：
 NR:当前行数
 NF:当前列数
@@ -214,11 +226,11 @@ for循环，if与c++类似，不需要指定变量类型，如: awk -F '·' '{ p
 $0指整行；
 OFS指定输出的分隔符
 
-**********************************************************************
-**********************2017-09-28**************************************
-**********************************************************************
+##2017-09-28
+
 linux c++下编码的转换：
 从utf-8转换到gbk：
+
 1. locale -a 查看所有机器支持的编码，这里需要用到zh_CN.utf8和zh_CN.gbk，
 保证这两个编码在输出列表中；
 2. include <locale>包；
@@ -507,81 +519,151 @@ cd boost_1_67_0
 echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/search/odin/spgoal/lib/boost/lib" >> ~/.bashrc
 source ~/.bashrc
 
-**********************************************************************
-**********************2018-05-02**************************************
-**********************************************************************
-配置nvidia驱动：
-Part I.
-# 确保nouveau被禁用
-$ lsmod | grep nouveau
+## 2018-05-02
+
+### 配置nvidia驱动：
+
+#### Part I
+
+##### 确保nouveau被禁用
+
+```
+ lsmod | grep nouveau
+```
+
 若以上命令输出信息，则表示nouveau没有被禁用。
-在centos系统中在/etc/modprobe.d/blacklist-nouveau.conf（没有则创建）文件中输入:
+在centos系统中在**/etc/modprobe.d/blacklist-nouveau.conf**（没有则创建）文件中输入:
+
+```shell
 blacklist nouveau
 options nouveau modeset=0
-重新生成kernel initramtf:
-$ sudo dracut --force
+```
 
-Part II.
-# python-pip 安装并更新到最新目录
+重新生成kernel initramtf:
+
+```
+$ sudo dracut --force
+```
+
+#### Part II.
+
+##### python-pip 安装并更新到最新目录
+
+```
 yum install python-pip
 pip install --upgrade pip
-# boost.python安装（参见daily)
+```
 
-Part III. (安装GPU驱动)
-# 1. 安装gcc工具
+##### boost.python安装（参见daily)
+
+#### Part III. (安装GPU驱动)
+
+#####1. 安装gcc工具
+
+```
 yum install gcc*
-# 2. 安装dkms
+```
+
+#####2. 安装dkms
+
+```
 wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 rpm -ivh epel-release-latest-7.noarch.rpm
 yum install --enablerepo=epel dkms
-# 3. 安装kernel 开发包等
-yum install kernel*
-# 4. 安装cuda
-wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
-###(此处根据对应机型以及tensorflow对应版本寻找合适版本安装，例如，我想安装tensorflow1.8.0，在https://www.tensorflow.org/install/install_sources#common_installation_problems
-网站上发现需要cuda9.0以及cudnn7，因此需要cuda9.0，9.1或者其他版本不适用)
-sh cuda_9.0.176_384.81_linux-run --silent --driver --toolkit --toolkitpath=/tmp/ --samples --samplespath=/tmp/ --verbose
-###(路径可修改，此处安装可能会有丢失包，看打印信息，比如我安装时有libX11.so,libXi.so等未安装，则使用yum install libX11命令安装上，余
-###(者类推)
-# 5. 编辑环境变量
-在~/.bashrc中添加以下几行。
-CUDA_HOME=/usr
-PATH=$PATH:$CUDA_HOME/bin
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64
-使环境变量生效：
-$ source ~/.bashrc
-# 6. 挂载驱动
-modprobe nvidia
-###(到此CUDA安装成功)
+```
 
-Part IV. 安装cuDNN
+#####3. 安装kernel 开发包等
+
+```
+yum install kernel*
+```
+
+#####4. 安装cuda
+
+```
+wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
+```
+
+(此处根据对应机型以及tensorflow对应版本寻找合适版本安装，例如，我想安装tensorflow1.8.0，在https://www.tensorflow.org/install/install_sources#common_installation_problems
+
+网站上发现需要cuda9.0以及cudnn7，因此需要cuda9.0，9.1或者其他版本不适用)
+
+```
+sh cuda_9.0.176_384.81_linux-run --silent --driver --toolkit --toolkitpath=/tmp/ --samples --samplespath=/tmp/ --verbose
+```
+
+(路径可修改，此处安装可能会有丢失包，看打印信息，比如我安装时有libX11.so,libXi.so等未安装，则使用yum install libX11命令安装上，余者类推)
+
+#####5. 编辑环境变量
+
+在~/.bashrc中添加以下几行。
+
+```
+CUDA_HOME=/usr
+PATH=PATH:CUDA_HOME/bin
+LD_LIBRARY_PATH=LD_LIBRARY_PATH:CUDA_HOME/lib64:CUDA_HOME/extras/CUPTI/lib64
+```
+
+使环境变量生效：
+
+```
+ source ~/.bashrc
+```
+
+#####6. 挂载驱动
+
+```
+modprobe nvidia
+```
+
+(到此CUDA安装成功)
+
+#### Part IV. 安装cuDNN
+
 官网地址：https://developer.nvidia.com/cudnn
 按照指示下载软件，我下载的是：cudnn-9.0-linux-x64-v7
 安装：
-$ tar -xzvf cudnn-9.0-linux-x64-v7
-$ sudo cp cuda/include/cudnn.h /tmp/include
-$ sudo cp cuda/lib64/libcudnn* /tmp/lib64
-$ sudo chmod a+r /tmp/include/cudnn.h /tmp/lib64/libcudnn*
 
-Part V. 安装Tensorflow
-pip install tensorflow-gpu==1.8.0(为了使服务器上的tensorflow版本同步，不加版本号默认为最新)
+```
+tar -xzvf cudnn-9.0-linux-x64-v7
+sudo cp cuda/include/cudnn.h /tmp/include
+sudo cp cuda/lib64/libcudnn* /tmp/lib64
+sudo chmod a+r /tmp/include/cudnn.h /tmp/lib64/libcudnn*
 
-Part VI. 测试
-$ python
-$ >>> import tensorflow as tf
-  >>> (如果此处不成功，提示：ImportError: libcublas.so.9.0: cannot open shared object file: No such file or directory
-  则添加以下指令：则添加以下指令：
-  $ echo "/tmp/lib64" >> /etc/ld.so.conf.d/cuda.conf
-  $ ldconfig)
-  >>> hello = tf.constant('Hello, TensorFlow!')
-  >>> sess = tf.Session()
-  >>> print(sess.run(hello))
-  Hello, TensorFlow!
+```
+
+#### Part V. 安装Tensorflow
+
+```
+pip install tensorflow-gpu==1.8.0
+```
+
+(为了使服务器上的tensorflow版本同步，不加版本号默认为最新)
+
+#### Part VI. 测试
+
+```
+ python
+ >>> import tensorflow as tf 
+ >>> hello = tf.constant('Hello, TensorFlow!')
+ >>> sess = tf.Session()
+ >>> print(sess.run(hello))
+ Hello, TensorFlow!
+```
+
+如果此处不成功，提示：ImportError: libcublas.so.9.0: cannot open shared object file: No such file or directory,则添加以下指令：则添加以下指令：
+
+```
+echo "/tmp/lib64" >> /etc/ld.so.conf.d/cuda.conf
+ldconfig
+```
+
+其中"/tmp/lib64"为安装路径，若安装路径不同则更换之；
+
 若通过以上测试，说明安装tensorflow成功。
 
-**********************************************************************
-**********************2018-05-03**************************************
-**********************************************************************
+## 2018-05-03
+
 文件去重等相关操作：
 1. 取出两个文件的并集(重复的行只保留一份)
 $ cat file1 file2 | sort | uniq > file3
@@ -600,32 +682,30 @@ $ sort file | uniq
 $ sort file | uniq –u
 上面的命令可以把重复的行全部去掉，也就是文件中的非重复行！
 
-**********************************************************************
-**********************2018-05-26**************************************
-**********************************************************************
+##2018-05-26
+
 java.net.UnknownHostException: xxx: 未知的名称或服务
 这是由于本地域名localhost未解析造成的。我出该问题的机器是nmyjs_105_106,
 将它映射到127.0.0.1上即可，即在/etc/hosts添加一行：
 127.0.0.1 nmyjs_105_106 localhost
 
-**********************************************************************
-**********************2018-06-05**************************************
-**********************************************************************
+##2018-06-05
+
+```
 pip --default-timeout=100 （设置延迟时间） -i https://pypi.tuna.tsinghua.edu.cn/simple (设置源）--ignore-installed ipython (忽略包针）
 cat /usr/local/cuda/version.txt
+```
 
-**********************************************************************
-**********************2018-06-13**************************************
-**********************************************************************
+## 2018-06-13
+
 cuda 版本 
 cat /usr/local/cuda/version.txt
 
 cudnn 版本 
 cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 
-**********************************************************************
-**********************2018-07-02**************************************
-**********************************************************************
+##2018-07-02
+
 安装Expect:
 1. 下载最新版本的Tcl和Expect
 已下载位置：(root@10.141.105.106:/search/odin/gejx2010/software/soft_expect)
@@ -658,9 +738,8 @@ tar -zxvf expect5.45.3.tar.gz
 5. 创建符号链接
     ln -s /tools/bin/expect /usr/bin/expect 
 	
-**********************************************************************
-**********************2018-07-03**************************************
-**********************************************************************
+##2018-07-03
+
 一、命令行解析工具：
 import argparse
 parser.add_argument('--batch_size', default=100, type=int, help='batch size')
@@ -669,32 +748,35 @@ parser.add_argument('--batch_size', default=100, type=int, help='batch size')
 python test.py --default-timeout=100 -i https://pypi.tuna.tsinghua.edu.cn/simple
 在研究tf-hub时发现的，由于经常出现超时，以及下载速度过慢，所以尝试使用了pip控制超时的参数，可以通过。
 
-**********************************************************************
-**********************2018-07-13**************************************
-**********************************************************************
+##2018-07-13
+
 注重异步程序的编写：
+
+```python
 from tornado.httpclient import AsyncHTTPClient
 import asyncio
 import json
 import urllib
 
 async def check_music(query):
-​    client = AsyncHTTPClient()
-​    resp = await client.fetch("http://10.141.105.106:5858/response?query=%s" % urllib.parse.quote_plus(query))
-​    maybe_music = json.loads(resp.body.decode("utf-8"))[0] == 1
-​    if maybe_music:
-​        r = await search_qq_music(query)
-​        if r is not None:
-​            return True, {"music_result": r}
-​    return False, None
-​	
+    client = AsyncHTTPClient()
+    resp = await client.fetch("http://10.141.105.106:5858/response?query=%s" % urllib.parse.quote_plus(query))
+    maybe_music = json.loads(resp.body.decode("utf-8"))[0] == 1
+    if maybe_music:
+        r = await search_qq_music(query)
+        if r is not None:
+            return True, {"music_result": r}
+    return False, None
+	
 async def main():
-​    r = await check_music("周杰伦的青花瓷")
-​	print ("r:", r)
+    r = await check_music("周杰伦的青花瓷")
+	print ("r:", r)
 
-if __name__ == "__main__":
-​    loop = asyncio.get_event_loop()
-​	loop.run_until_complete(main())
+if name == "main":
+    loop = asyncio.get_event_loop()
+	loop.run_until_complete(main())
+
+```
 
 可以学习的地方：
 1. async 定义异步函数；
@@ -703,48 +785,60 @@ if __name__ == "__main__":
 4. 使用AsyncHTTPClient()引入异步请求Client，使用fetch方法获得请求结果；
 5. 使用urllib.parse.quote_plus转义query函数；
 
-**********************************************************************
-**********************2018-07-13**************************************
-**********************************************************************
+##2018-07-13
+
 字符串拼接方法：
 a = "".join("bcd")
 
-**********************************************************************
-**********************2018-08-08**************************************
-**********************************************************************
+##2018-08-08
+
 git针对不同项目设置不同的用户名（不需要修改全局设置）:
 1. 进入git项目文件夹根目录，配置文件在.git/config中，使用如下命令可以修改
-用户名和邮箱：
-git config user.name "gejunxiang"
-git config user.email "gejunxiang@sogou-inc.com"
-如果有必要，使用如下命令取消全局设置：
-git config --global --unset user.name
-git config --global --unset user.email
+  用户名和邮箱：
+
+  ```sh
+  git config user.name "gejunxiang"
+  git config user.email "gejunxiang@sogou-inc.com"
+  ```
+
+  如果有必要，使用如下命令取消全局设置：
+
+  ```sh
+  git config --global --unset user.name
+  git config --global --unset user.email
+  ```
+
 2. ~/.ssh/config配置，参见(2018-03-23的日志），设置针对本项目的内容，例如我的：
-'''
-# self(gejunxiang@sogou-inc.com)
-Host intent
-HostName git.sogou-inc.com
-PreferredAuthentications publickey
-IdentityFile /root/.ssh/gejx_sogou_id_rsa
-User gejunxiang
-'''
+
+  ```sh
+  #self(gejunxiang@sogou-inc.com)
+  Host intent
+  HostName git.sogou-inc.com
+  PreferredAuthentications publickey
+  IdentityFile /root/.ssh/gejx_sogou_id_rsa
+  User gejunxiang
+  ```
 3. 在本地git项目的config中，将url中的hostname url改成~/.ssh/config中使用的host，我的情况是：
-原来：
-[remote "origin"]
+  原来：
+
+  ```
+  [remote "origin"]
     url = git@git.sogou-inc.com:gejunxiang/IntentJustify.git
-    fetch = +refs/heads/*:refs/remotes/origin/*
-修改后：
-[remote "origin"]
+    fetch = +refs/heads/:refs/remotes/origin/
+  ```
+
+  修改后：
+
+  ```
+  [remote "origin"]
     url = git@intent:gejunxiang/IntentJustify.git
-    fetch = +refs/heads/*:refs/remotes/origin/*
-	
+    fetch = +refs/heads/:refs/remotes/origin/
+  ```
 
-只有这样，git才能正确使用配置的内容。 
+  只有这样，git才能正确使用配置的内容。 
 
-**********************************************************************
-**********************2018-08-27**************************************
-**********************************************************************
+## 2018-08-27
+
 1.这会为你保留本地文件，但会在其他人拉下时删除它。
 
 git rm --cached <file-name>或git rm -r --cached <folder-name>
@@ -757,9 +851,8 @@ git update-index --assume-unchanged <path-name>
 
 git update-index --skip-worktree <path-name>
 
-**********************************************************************
-**********************2018-08-30**************************************
-**********************************************************************
+##2018-08-30
+
 一、 今天遇到python3中的编码问题，具体是这样的：
 ​    从xiaowei请求时，拿到的response基本是utf-8编码的，但有个别会报UnicodeDecodeError；细查后发现
 ​    这些response中有不合法编码（unicode的编码），导致上述错误。在查询API后发现以下解决方法：
@@ -768,8 +861,9 @@ git update-index --skip-worktree <path-name>
 ​	
 二、对于git的一个困扰是：一旦在某一次向仓库中提交一个大文件后，即便后来将其删除或者加入ignore，文件仍然会保留在历史
 记录中(.git)。如果这些文件曾被提交到服务器，会造成远程库新建时把这些记录也一并抓取，造成抓取缓慢。
+
 搜索过程中学到了以下有意思的指令，记录一下：
-----------------------------------------------------------------------------------------
+
 链接1:（https://segmentfault.com/q/1010000002564327）
 1. 新建一个可以作为根的分支：
 	git checkout --orphan new_start
@@ -797,16 +891,18 @@ git update-index --skip-worktree <path-name>
    git repack
 -------------------------------------------------------------------------------------------
 上述三个方法都有尝试，均未成功。最终解决问题的方案为（基本是在链接2的基础上）：
-$ git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch "shorten_tupu tree_tupu"' --prune-empty -- --all
-$ rm -rf .git/refs/original
-$ rm -rf .git/logs
-$ git gc
-$ git prune --expire now (这行是完全删除，谨慎；上一步已经可以保证大文件不再传播）
-$ git push origin master --force --all
 
-**********************************************************************
-**********************2018-09-03**************************************
-**********************************************************************
+```
+git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch "shorten_tupu tree_tupu"' --prune-empty -- --all
+rm -rf .git/refs/original
+rm -rf .git/logs
+git gc
+git prune --expire now (这行是完全删除，谨慎；上一步已经可以保证大文件不再传播）
+git push origin master --force --all
+```
+
+##2018-09-03
+
 ?*? 对NLP的一些感悟：
 做过了文本分类、翻译和预测等的模型后，神经网络确实在很大程度上提高了人的
 效率和机器对语言、图形、图像的理解；但仍感觉无法接触到语言和图像的真谛，
@@ -817,27 +913,26 @@ $ git push origin master --force --all
 文本和翻译上的神经网络模型都缺乏准确性；基于整体的语言理解才能最终让机器懂
 得人的语言。
 
-**********************************************************************
-**********************2018-09-04**************************************
-**********************************************************************
+##2018-09-04
+
 一、今天使用std map时，传入map<char*, int>类型，结果遇到以下两个问题：
 1）使用char* start读取值，传入时因为没有更新指针，导致几次插入后map中始终
    只有一个元素；应当每次插入时start需要new一下；
 2）使用char* 作为key，结果在find时比较的是char*也就是字符串地址而非内容，
    应当改为string输入，切记切记！
 
-**********************************************************************
-**********************2018-09-07**************************************
-**********************************************************************
+##2018-09-07
+
 一、vim中显示实时更新的文件：
 Esc + : + e
 
 二、sed命令
 sed "2,$d" file
 
-**********************************************************************
-**********************2018-09-12**************************************
-**********************************************************************
+
+
+##2018-09-12
+
 一、python查看第三方库版本号：
    我们可以利用  pip list 和 pip freeze命令查看所有安装包的版本号
 
@@ -849,75 +944,78 @@ sed "2,$d" file
   seq 2 3 20 #以2起始，3为间隔生成[2,20]间的数
   seq -s" " -f"str%03g" 9 11 #-s指定分隔符，-f指定输出样式, -w指定同宽
 
-**********************************************************************
-**********************2018-09-13**************************************
-**********************************************************************
+##2018-09-13
+
 python为结构或者方法增加in关键字：
 一、为结构实现in关键字有两种协议A和B，在两种方法同时存在的情况下优先使用A。
-  1. 协议A: __iter__ + next
-    '''
-	class A:
-	​	def __iter__(self):
-	​		self.limit = 4 
-	​		self.times = 0 
-	​		self.init = 1 
-	​		return self
-	
-		def next(self):
-			if self.times >= self.limit:
-				raise StopIteration()
-			else:
-				x = self.init
-				self.times += 1
-				self.init += 1
-				return x
-	
-	print 'A>>>>>>'
-	for x in A():
-	​	print x
-    '''
-  2. 协议B：__getitem__ + __len__
-    '''
-	class B:
-	
-		def __init__(self):
-			self._list = [5, 6, 7, 8]
-		 
-		def __getitem__(self, slice):
-			return self._list[slice]
-		 
-		def __len__(self):
-			return len(self._list)
-	
-	print 'B>>>>>>'
-	for x in B():
 
+  1. 协议A: __iter__ + next
+
+    ```python
+    class A:
+    	def iter(self):
+    		self.limit = 4 
+    		self.times = 0 
+    		self.init = 1 
+    		return self
+    		
+    	def next(self):
+            if self.times >= self.limit:
+                raise StopIteration()
+            else:
+                x = self.init
+                self.times += 1
+                self.init += 1
+                return x
+                
+    print 'A>>>>>>'
+    for x in A():
+    	print x
+    ```
+
+  2. 协议B：__getitem__ + __len__
+
+    ```python
+    class B:
+        def __init__(self):
+            self._list = [5, 6, 7, 8]
+    
+        def __getitem__(self, slice):
+            return self._list[slice]
+    
+        def __len__(self):
+            return len(self._list)
+            
+    print 'B>>>>>>'
+    for x in B():
+    
     print x
-    '''
+    ```
+
 
 二、为方法实现in只需要加上yield关键字即可。
-  '''
-​    def C():
-​		for x in range(9, 13):
-​			yield x
-​	 
-​	print 'C>>>>>>'
-​	for x in C():
-​	print x
 
-  '''
+```python
+def C():
+    for x in range(9, 13):
+        yield x
 
-**********************************************************************
-**********************2018-09-19**************************************
-**********************************************************************
+print 'C>>>>>>'
+for x in C():
+    print x
+```
+
+
+
+##2018-09-19
+
 一、git取消每次输入密码：
   git config --global credential.helper store（只需要输入一次）
 二、yes命令
   对每个选项输入yes
 
-**********************************************************************
-**********************2018-09-25**************************************
-**********************************************************************
+##2018-09-25
+
 一、字符串编码新解(python2)
   在python2下，确实有很多字符串编码方式令人困惑，比如以下规律：
   1)任何字符串拼接，只要其中一个出现unicode，结果必为unicode；如：
@@ -928,15 +1026,13 @@ python为结构或者方法增加in关键字：
   2)os.path.join()同理，只要参数中出现一个unicode编码，则结果为unicode；
   这个bug导致acmotion load_struct时出错。
 
-**********************************************************************
-**********************2018-09-26**************************************
-**********************************************************************
+##2018-09-26
+
 一、lsof -i :80 (查看端口号为80的进程)
 二、xargs (将输出重定向为输入参数)
 
-**********************************************************************
-**********************2018-09-27**************************************
-**********************************************************************
+##2018-09-27
+
 一、C++ STL排序算法:
   sort：快排+内插排序，不同于普通快排，有很好的平均性能，可以保证算法为
   nlogn且系数很小；
@@ -944,9 +1040,8 @@ python为结构或者方法增加in关键字：
   partial_sort: 堆排序，对[start, end]的元素取[start, mid]的前mid-start+1个
   nth_element: 取数组中的第n个；
 
-**********************************************************************
-**********************2018-09-29**************************************
-**********************************************************************
+##2018-09-29
+
 一、Kickstart Sums of Sums问题总结：
   （感慨：花了近三天的时间搞定这个问题，虽然算法一开始就想到了，但实现算法
   的过程却异常曲折，出了无数的bug，查阅了很多C/C++算法。有一段时间没写C代码
@@ -1110,9 +1205,8 @@ python为结构或者方法增加in关键字：
   性时绝不能使用等等；二分查找出来的边界需不需要再加减1等等；
   5）long long问题要重视，每一次数据的定义都尽量分析是否存在错误。
 
-**********************************************************************
-**********************2018-09-30**************************************
-**********************************************************************
+##2018-09-30
+
 一、C++ STL函数学习：
   1）lower_bound返回第一个不小于比较数的数，该数可能等于比较数；
   2）upper_bound返回第一个大于比较数的数，不可能等于比较数；
@@ -1124,22 +1218,19 @@ python为结构或者方法增加in关键字：
   哪错了；花费了不少时间才发现，我记录最高位奇数位数值last_bit没做对，导致结果在2098类似的数时输出依然是2，坑啊，
   类似的错误确实很难调试。如果出现类似问题，以后要多加debug信息了。保持思路清晰必须很重要啊。
 
-**********************************************************************
-**********************2018-10-08**************************************
-**********************************************************************
+## 2018-10-08
+
 一、linux增加用户名，指定目录，设定密码：
   useradd|adduser -d /search/odin/open open
   passwd open
 
-**********************************************************************
-**********************2018-10-08**************************************
-**********************************************************************
+##2018-10-08
+
 处理边界问题有没有比较通用的模式？减少边界问题的处理和定义；目前还没找到比较有效的思考方法，总是在定义边界时花费
 太多时间思考。
 
-**********************************************************************
-**********************2018-10-12**************************************
-**********************************************************************
+##2018-10-12
+
 一、linux命令:
   1) cat t | colrm 4 6 删除文件t中第4列到第六列的字符
   2) comm -123 file1 file2 比较文件差异，第三列放两个文件共同数据；
@@ -1155,9 +1246,8 @@ python为结构或者方法增加in关键字：
 
 二、判断最长回文字符串有O(n)的方法，记住这个方法；
 
-**********************************************************************
-**********************2018-10-16**************************************
-**********************************************************************
+##2018-10-16
+
 一、Kickstart/NoNine问题总结：
   这是一首总体来说比较简单的题，然而对我来说还是有不少坑踩进去了。
   1）思路：很简单，统计包含9的数字和统计9的倍数，再减去二者的交集即可。
@@ -1186,9 +1276,8 @@ python为结构或者方法增加in关键字：
 
 6.3）c++转换字符串时要注意在最后加上休止符'\0'。
 
-**********************2018-10-16**************************************
+##2018-10-16
 
-**********************************************************************
 一、kickstart/ScrambleWords总结：
 ​    这是一道想了很久的问题，断断续续想了一周，始终在考虑能不能在线性或者
 ​	nlogn的时间内解决。今天看了下网上解决人的做法，才发现自己或许进了一个
@@ -1225,25 +1314,22 @@ python为结构或者方法增加in关键字：
 ​	4.4) 各种集成好的高级数据库的使用:unordered_set/map,multimap等等。
 ​	
 
-**********************************************************************
-**********************2018-10-23**************************************
-**********************************************************************
+##2018-10-23
+
 一、tornado.options.parse_command_line()函数会默认为我们配置标准logging
 ​    模块，即默认开启了日志功能，并向标准输出（屏幕）打印日志信息。如果
 ​	想关闭tornado默认的日志功能，代码中该句之前添加：
 ​	options.logging = None
 ​	options.parse_command_line()
 ​	
-**********************************************************************
-**********************2018-10-24**************************************
-**********************************************************************
+
+##2018-10-24
+
 一、linux命令ab测试服务器性能
   ab -c 5 -n 5 http://10.141.105.106:8787/?query=xxx(-c指定并发数，-n指定用户数)
 
-**********************************************************************
-**********************2018-10-25**************************************
+##2018-10-25
 
-**********************************************************************
 一、安装python3.x(python3.6为例)的简单方法(yum直接安装):
 
 ```
@@ -1296,9 +1382,8 @@ python为结构或者方法增加in关键字：
 
 
 
-**********************************************************************
-**********************2018-10-31**************************************
-**********************************************************************
+##2018-10-31
+
 一、Centos搭建ftp服务器
 ​	yum install -y vsftpd 
 
@@ -1321,27 +1406,29 @@ python为结构或者方法增加in关键字：
 
 ​					  
 
-**********************************************************************
-**********************2018-11-01**************************************
+##2018-11-01
 
-**********************************************************************
-一、docker安装nvidia-docker问题及为使用tensorflow-gpu for docker：
+### 一、docker安装nvidia-docker问题及为使用tensorflow-gpu for docker：
+
 ​	参照nvidia-docker的git文档使用下列脚本安装:
-​	# If you have nvidia-docker 1.0 installed: we need to remove it and all existing GPU containers
-​	docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
-​	sudo yum remove nvidia-docker
 
-	# Add the package repositories
-	distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-	curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | \
-	  sudo tee /etc/yum.repos.d/nvidia-docker.repo
-	
-	# Install nvidia-docker2 and reload the Docker daemon configuration
-	sudo yum install -y nvidia-docker2
-	sudo pkill -SIGHUP dockerd
-	
-	# Test nvidia-smi with the latest official CUDA image
-	docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi	
+```sh
+#If you have nvidia-docker 1.0 installed: we need to remove it and all existing GPU     #containers
+docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
+sudo yum remove nvidia-docker
+
+# Add the package repositories
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.repo | \
+  sudo tee /etc/yum.repos.d/nvidia-docker.repo
+
+# Install nvidia-docker2 and reload the Docker daemon configuration
+sudo yum install -y nvidia-docker2
+sudo pkill -SIGHUP dockerd
+
+# Test nvidia-smi with the latest official CUDA image
+docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi	
+```
 
 遇到/etc/docker/daemon.json无法创建的问题，查找许久未发现原因，最后定位是docker版本太低导致的；
 机器上装的是docker_18.06.0，重装docker_18.06.1，问题解决。
@@ -1737,3 +1824,13 @@ int bin_search_area(int k) {
 5. 使用位处理运算要注意：(a & b == c)这种写法有问题，应该写成((a & b) == c); 位运算优先级低；
 ```
 
+
+
+## 2018-12-05
+
+### 一、memset错误
+
+使用c++的memset时经常会犯以下错误，在此记之：
+
+1. 忘记包含头文件，#include<memset>;
+2. memset使用sizeof时，如果sizeof的参数是用new开辟指针，则返回的是指针变量的长度8；如果传入的是数组，则会返回正确的大小；
