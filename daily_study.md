@@ -698,11 +698,17 @@ cat /usr/local/cuda/version.txt
 
 ## 2018-06-13
 
-cuda 版本 
-cat /usr/local/cuda/version.txt
+**cuda 版本 **
 
-cudnn 版本 
+```shell
+cat /usr/local/cuda/version.txt
+```
+
+**cudnn 版本 **
+
+```sh
 cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+```
 
 ##2018-07-02
 
@@ -1832,5 +1838,5 @@ int bin_search_area(int k) {
 
 使用c++的memset时经常会犯以下错误，在此记之：
 
-1. 忘记包含头文件，#include<memset>;
+1. 忘记包含头文件，#include<cstring>;
 2. memset使用sizeof时，如果sizeof的参数是用new开辟指针，则返回的是指针变量的长度8；如果传入的是数组，则会返回正确的大小；
