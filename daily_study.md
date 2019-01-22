@@ -2493,13 +2493,83 @@ $$M(x, L, n) > S(L, k) $$
 
 
 
+## 2019-01-22
 
+### 一、leetcode总结
 
+#### 1. First Missing Positive
 
+问题是找一串数组中第一个丢失的正整数。即给一个数组{an}，找到正整数集中第一个不在{an}中的正整数。
 
+算法要求是：O(n)的时间复杂度和O(1)的空间复杂度。
 
+对于这道题的算法思考，我经历了以下几步：
 
+* 桶排序，找到第一个空桶输出即可，时间复杂度为O(n)，但空间复杂度亦为O(n)；
+* 先用一轮排序，再遍历数组找到丢失的数，时间复杂度为O(nlogn)， 空间复杂度为O(1)；
+* 直接开大小为n的数组，记录第i个位置是否有值，做法类似于桶排序，空间复杂度会超；
+* 第三个方法给了我提示，为什么要开这个数组呢？直接在数组内部实现不就行了？于是得到最终的算法。
 
+```c++
+    int firstMissingPositive(vector<int>& nums) {
+      int i = 0;
+      for (; i < nums.size(); ++i) 
+        if (0 < nums[i] && nums[i] <= nums.size() && nums[i] != nums[nums[i] - 1]) {
+          int m = nums[i];
+          nums[i] = nums[m - 1]; 
+          nums[m - 1] = m;
+        }   
+      for (i = 0; i < nums.size(); ++i)
+        if (nums[i] != i + 1)  
+          break;
+      return i + 1;
+    }   
 
+```
 
+在编写的时候，特别需要注意的地方在于第一个循环中的if判断式，在这里改了很久，总结一下：
+
+* 0 < nums[i]，否则会出现nums[m - 1]中秩为负的情况；
+* nums[i] != nums[nums[i] - 1]，这个是为了防止与自身交换，以及对于[1, 1]的情况类型设置的，如果不加if的判断，会形成死循环；
+
+另外需要在此重点说明的一个bug是：
+
+**int\*开的数组不能用sizeof来指明数组大小，因为此时sizeof指向的大小是一个指针的大小**。
+
+#### 2.  Trapping Rain Water
+
+给定数组${a_n}$，表示当前地基的高度，当降雨量足够大时，求数组间最大的积水量。例如：
+
+```
+Input: [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+```
+
+算法不难想，稍微花点功夫，在此记下，以便以后对于这类问题能够立刻实现算法；
+
+```c++
+    int trap(vector<int>& height) {
+      int l = 0, r = height.size() - 1;  
+      int sum = 0;
+      while (l < r) {
+        if (height[l] <= height[r]) {
+          int csum = 0, i = 0;
+          for (i = l + 1; i <= r; ++i) {
+            if (height[l] <= height[i]) break;
+            csum += height[i];
+          }   
+          sum += height[l] * (i - l - 1) - csum;
+          l = i;
+        } else {
+          int csum = 0, i = 0;
+          for (i = r - 1; l <= i; --i) {
+            if (height[r] <= height[i]) break;
+            csum += height[i];
+          }   
+          sum += height[r] * (r - i - 1) - csum;
+          r = i;
+        }   
+      }   
+      return sum;
+```
 
