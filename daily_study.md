@@ -203,7 +203,7 @@ libboost安装问题：
 2.解压文件
 3.进入boost_1_64_0
 4.终端输入:./configure --with-python=python3 // 之前这一步没加，要用python3编译
-5.修改./tools/build/src/tools/python.jam,547行，includes ?= $(prefix)/include/python$(version)m ;
+5.修改./tools/build/src/tools/python.jam,547行，includes ?= $(prefix)/include/python​$(version)m ;
 （注意加上m）
 6.运行./b2 --with-python 
 7.运行./b2 install //这一步是将库加入/usr/local目录，很关键
@@ -894,8 +894,7 @@ git update-index --skip-worktree <path-name>
 ​	response.body().decode("utf-8", errors="replace")
 ​	errors对应不同的处理方法，replace是针对出现unicode编码时的替换；ignore是忽略；
 ​	
-二、对于git的一个困扰是：一旦在某一次向仓库中提交一个大文件后，即便后来将其删除或者加入ignore，文件仍然会保留在历史
-记录中(.git)。如果这些文件曾被提交到服务器，会造成远程库新建时把这些记录也一并抓取，造成抓取缓慢。
+二、对于git的一个困扰是：一旦在某一次向仓库中提交一个大文件后，即便后来将其删除或者加入ignore，文件仍然会保留在历史记录中(.git)。如果这些文件曾被提交到服务器，会造成远程库新建时把这些记录也一并抓取，造成抓取缓慢。
 
 搜索过程中学到了以下有意思的指令，记录一下：
 
@@ -912,8 +911,7 @@ git update-index --skip-worktree <path-name>
 这部分内容主要学习了git gc以及相关命令，包括：
 1. git count-objects -v 查询使用空间
 2. git verify-pack -v .git/objects/pack/pack*.idx | sort -k3nr | tail -3 查看objects的大小及记录
-3. git rev-list --objects --all | grep 7a9eb2fb 查看objects的名称（看到这我心想，要是早点知道这条命令多好，之前
-有过一次类似的情况，但我是把objects一条条恢复的，因为不知道文件的名字）
+3. git rev-list --objects --all | grep 7a9eb2fb 查看objects的名称（看到这我心想，要是早点知道这条命令多好，之前有过一次类似的情况，但我是把objects一条条恢复的，因为不知道文件的名字）
 4. git log --pretty=oneline --branches -- git.tbz2 找出与文件相关的记录
 5. git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch shorten_tupu' -- 6df7640^..
    rm -Rf .git/refs/original
@@ -2571,5 +2569,55 @@ Output: 6
         }   
       }   
       return sum;
+```
+
+
+
+## 2019-02-13
+
+### 一、xshell 命令行快捷命令
+
+| 命令     | 作用                                 |
+| -------- | :----------------------------------- |
+| CTRL + d | 删除光标所在位置上的字符             |
+| CTRL + h | 删除光标所在位置前的字符             |
+| CTRL + k | 删除光标后面所有字符                 |
+| CTRL + u | 删除光标前面所有字符                 |
+| CTRL + w | 删除光标前一个单词                   |
+| ALT  + d | 删除光标所在位置的后单词             |
+| ctrl + ? | 撤消前一次输入                       |
+| ALT  + r | 撤消前一次动作                       |
+| CTRL + a | 光标移动到命令行开头                 |
+| CTRL + e | 光标移动到命令行结尾                 |
+| CTRL+ <- | 光标移动到前一个单词开头             |
+| CTRL+ -> | 光标移动到前一个单词开头             |
+| ALT  + u | 把光标当前位置单词变为大写           |
+| ALT  + u | 把光标当前位置单词变为小写           |
+| ALT  + u | 把光标当前位置单词头一个字母变为大写 |
+| CTRL + s | 锁住终端                             |
+| CTRL + s | 解锁终端                             |
+|          |                                      |
+|          |                                      |
+
+
+
+## 2019-03-01
+
+### 一、eval的使用
+
+今天在用json加载单双引号混合的数据时出错，数据如下：
+
+```
+{'label': "{'song_3_8': '小兔子乖乖'}", 'text': '我要听小兔子乖乖'}
+```
+
+json不能加载单引号数据，因而如果硬用json加载的话，需要转换格式；或者使用一串split单独提取需要的数据，很麻烦。然后查到了eval可以直接处理这种类型的数据。使用：
+
+```py
+dd = eval(dstr)
+print (dd["text"])
+# 输出：我要听小兔子乖乖
+print (dd["label"])
+# 输出：{'song_3_8': '小兔子乖乖'}
 ```
 
