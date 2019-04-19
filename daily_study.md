@@ -772,7 +772,6 @@ tar -zxvf expect5.45.3.tar.gz
     执行/tools/bin/expect出现expect1.1>提示符说明expect安装成功. 
 5. 创建符号链接
     ln -s /tools/bin/expect /usr/bin/expect 
-	
 ##2018-07-03
 
 一、命令行解析工具：
@@ -3869,3 +3868,49 @@ Large Case：
 
 
 
+## 2019-04-19
+
+### 一、CentOS 7安装Java
+
+#### 1. 下载java se
+
+参见网址:<https://www.oracle.com/technetwork/java/javase/overview/index.html>，找最新的链接下载；现在需要用户注册信息后才能下载，所以命令分开写了，不好直接wget。
+
+我下载的是java se 1.12.1.
+
+#### 2. 安装
+
+```
+tar -zxvf jdk-12.0.1_linux-x64_bin.tar.gz -C java
+```
+
+编辑环境变量，添加以下项，在~/.bashrc中:
+
+```
+export JAVA_HOME=/usr/local/java/jdk1.12.1
+#export JRE_HOME=${JAVA_HOME}/jre (1.8.0需要，1.12.1不需要)
+export CLASSPATH=$CLASSPATH:${JAVA_HOME}/lib:${JRE_HOME}/lib(1.12.1不需要填后边一项)
+export PATH=${JAVA_HOME}/bin:$PATH
+```
+
+#### 3. 验证
+
+```
+java -version
+```
+
+显示以下内容即正常：
+
+```
+java version "12.0.1" 2019-04-16
+Java(TM) SE Runtime Environment (build 12.0.1+12)
+Java HotSpot(TM) 64-Bit Server VM (build 12.0.1+12, mixed mode, sharing)
+```
+
+
+
+### 二、Stanford NER
+
+官网：<https://nlp.stanford.edu/software/CRF-NER.html#Download>
+
+训练自己的模型参考：<https://blog.sicara.com/train-ner-model-with-nltk-stanford-tagger-english-french-german-6d90573a9486>
