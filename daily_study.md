@@ -4069,3 +4069,215 @@ $$
 
 
 
+## 2019-04-26
+
+### 一、 制作linux系统命令
+
+这个并不复杂，只要有可执行脚本，如自己制作的可执行脚本，路径在:/usr/local/sbin/add_title。通过一行命令即可建立系统命令：
+
+```sh
+ln -s /usr/local/sbin/add_title /usr/bin/title
+```
+
+这样，title就成了系统命令，可以直接title 加参数使用。
+
+需要注意的是：
+
+**ln -s 的两个路径必须是全路径**。
+
+
+
+### 二、 linux shell 获取参数
+
+一种方法是通过\$1、\$2的方式获取指定位置的参数，另一种是通过-n name的方式获取。今天学习了后一种获取的方式：
+
+#### 1) 短选项参数
+
+
+
+```sh
+while getopts ":l:a:" opt
+do
+  case $opt in
+    l)  
+    lan=$OPTARG
+    ;;  
+    a)  
+    author=$OPTARG
+    ;;  
+    ?)  
+    echo "未知参数，请使用-l指定语言(language)，-a指定作者(author)"
+    exit 1;; 
+  esac
+done
+```
+
+如上所示，通过getopts方式指定短选项名称，“a:bc”表示支持-a|-b|-c三种短选项，-a后边的冒号表示该参数后边必须有值。
+
+使用时，用\$opt指定短选项名称(用getopts "a:bc" opt类似的句式获取)，\$OPTARG指定对应的参数。一般通过case ... in .... esac 语句处理。
+
+#### 2） 长选项参数
+
+使用getopt命令。参考其自带脚本：
+
+```sh
+#!/bin/bash
+
+# A small example program for using the new getopt(1) program.
+# This program will only work with bash(1)
+# An similar program using the tcsh(1) script language can be found
+# as parse.tcsh
+
+# Example input and output (from the bash prompt):
+# ./parse.bash -a par1 'another arg' --c-long 'wow!*\?' -cmore -b " very long "
+# Option a
+# Option c, no argument
+# Option c, argument `more'
+# Option b, argument ` very long '
+# Remaining arguments:
+# --> `par1'
+# --> `another arg'
+# --> `wow!*\?'
+
+# Note that we use `"$@"' to let each command-line parameter expand to a
+# separate word. The quotes around `$@' are essential!
+# We need TEMP as the `eval set --' would nuke the return value of getopt.
+
+#-o表示短选项，两个冒号表示该选项有一个可选参数，可选参数必须紧贴选项
+#如-carg 而不能是-c arg
+#--long表示长选项
+#"$@"在上面解释过
+# -n:出错时的信息
+# -- ：举一个例子比较好理解：
+#我们要创建一个名字为 "-f"的目录你会怎么办？
+# mkdir -f #不成功，因为-f会被mkdir当作选项来解析，这时就可以使用
+# mkdir -- -f 这样-f就不会被作为选项。
+
+TEMP=`getopt -o ab:c:: --long a-long,b-long:,c-long:: \
+     -n 'example.bash' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+#set 会重新排列参数的顺序，也就是改变$1,$2...$n的值，这些值在getopt中重新排列过了
+eval set -- "$TEMP"
+
+#经过getopt的处理，下面处理具体选项。
+
+while true ; do
+        case "$1" in
+                -a|--a-long) echo "Option a" ; shift ;;
+                -b|--b-long) echo "Option b, argument \`$2'" ; shift 2 ;;
+                -c|--c-long)
+                        # c has an optional argument. As we are in quoted mode,
+                        # an empty parameter will be generated if its optional
+                        # argument is not found.
+                        case "$2" in
+                                "") echo "Option c, no argument"; shift 2 ;;
+                                *)  echo "Option c, argument \`$2'" ; shift 2 ;;
+                        esac ;;
+                --) shift ; break ;;
+                *) echo "Internal error!" ; exit 1 ;;
+        esac
+done
+echo "Remaining arguments:"
+for arg do
+   echo '--> '"\`$arg'" ;
+done
+
+```
+
+
+
+### 三、linux系统java撞墙实录
+
+```java
+public class HelloWorld {
+    public static void main(String args[]) {
+        System.out.println(" You have just run HelloWorld !");       
+    }
+}
+```
+
+因为好久没用java了，今天来试了一下，却发现屡次碰灰，因此记录一下。
+
+事情是这样的：做NER时用到stanfordner工具，训练时用了一个越大的gazette（约200M），导致出现了各种各样的问题，第一个问题是：Memory  limit exceed，这个很快debug了，这是因为我在运行训练模型时指定了：
+
+```sh
+java -mx500m
+```
+
+这个参数限制了可以使用的空间大小，导致错误。
+
+接下来，模型训练完成，使用模型时，又出了种种问题。首先又是同样的空间大小受限，但这回不能通过在脚本直接修改了，因为我是在python脚本里调用nltk接口里的nltk.tag.stanford.StanfordNERTagger来进行测试的。因此，我需要找到指定空间大小的参数怎么传入。
+
+最终通过文档找到了这个接口，通过java_options初始化上述类即可。
+
+于是，服务器能跑起来了，测试也能通过了，但问题没有结束，速度太慢，用nltk提供的接口，运行一个query将近一分钟！这显然是不能忍受的！
+
+于是，我用了stanfordner中的工具，使用脚本运行他们建议的服务器搭建，测试了一下，除了初始化确实需要很久外，每个query并不需要很长时间进行处理。这说明这个问题可以解决，但需要利用stanfordner内部的接口。
+
+查询了很久的文档，发现nltk(python)里似乎没法解决这个问题，网上有pyner的工具包，但尝试了下，发现没跑通过，可能是他的版本太旧的缘故。最后，我想，为什么不自己写一个呢？但自己许久没有写过java了，就当玩玩吧，于是出现了前边的java代码。
+
+代码本身是没有问题的，从开始说起，我只记得java中类执行需要主程序main，文件名需要与类名一致，但很多细节都忘了，于是，通过HelloWorld熟悉了下。
+
+编译过程也忘了，上网查了下：
+
+```sh
+javac -d . HelloWorld.java
+```
+
+运行过程也忘了：
+
+```sh
+java HelloWorld
+```
+
+到这里，还算顺利，程序运行通过输出那些字样。于是我开始尝试加入stanfordner中的相关接口，如下：
+
+```java
+package here;
+
+import java.io.IOException;
+import java.util.Properties;
+
+import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+import edu.stanford.nlp.ie.NERServer;
+import edu.stanford.nlp.ie.crf.CRFClassifier;
+
+public class HelloWorld {
+
+  public static void main(String[] args) {
+    System.out.println("Hello World");
+  }
+}
+```
+
+于是，撞墙开始了，都是查文档解决的，在此记录：
+
+1. 无法编译，因为找不到edu包。这是引入工程外第三方jar库的问题，需要-cp拷贝第三方库；
+
+```sh
+javac -cp ner_tagger.jar -d . HelloWorld.java
+```
+
+2. 上述命令一开始打时总忘记打HelloWorld.java后边的.java字样，于是报错：
+
+```
+error: Class names, 'HelloWorld', are only accepted if annotation processing is explicitly requested
+```
+
+3. 运行时我如法刨制，使用同样的命令：java (-cp ner-tagger.jar) HelloWorld，但始终会报如下错误：
+
+```
+Error: Could not find or load main class HelloWorld
+Caused by: java.lang.NoClassDefFoundError: here/HelloWorld (wrong name: HelloWorld)
+```
+
+提示找不到HelloWorld。上网查了下，说是CLASSPATH配置的问题，没有加".:$CLASSPATH"，这个点表示系统会把当前路径加入搜索路径，我看了下，确实忘加了。然后我加上后，发现错误依旧存在。最后，还是在网上找到了解决方法，原来，我还需要引用package名，正确的运行方式应当是：
+
+```java
+java here.HelloWorld
+```
+
+最终运行通过。
