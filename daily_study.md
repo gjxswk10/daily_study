@@ -4467,3 +4467,134 @@ java here.HelloWorld
 ```
 
 最终运行通过。
+
+
+
+## 2019-05-09
+
+### 一、vim 显示乱码
+
+一开始以及是系统设置字体的原因，但没生效，实际上是vim本身的原因，设置vim的中文字体即可。
+
+编辑~/.vimrc，然后在其中加入：
+
+```
+set fileencodings=ucs-bom,utf-8,gbk,gb2312,cp936,gb18030,big5,latin-1
+set encoding=utf-8
+set termencoding=utf-8
+set fileencoding=utf-8
+```
+
+到这里，对于遇到的Case仍然没有得到解决。
+
+最后才搞清楚原因，原文件是GBK编码的，但即便是用gb18030其中仍然也会存在乱码，这个时候，vim会使用兜底的latin-1来显示中文字符，所以无论怎么调整编码依旧无效。所以可以使用iconv强制转码：
+
+```sh
+iconv -c -f gb18030 -t utf8 [filename] > [output]
+```
+
+其中-c表示忽略不能转码的部分。最终再用vim打开即可。
+
+
+
+## 2019-05-14
+
+### 一、python执行linux系统命令：
+
+```python
+r = os.system("ls .")
+# r: 系统命令执行状态，0表示正常
+r = os.popen("ls .")
+# r: 为命令的执行结果，保存在类文件读写对象里
+for line in r:
+  print line
+# 这样可以读出每一行命令
+```
+
+
+
+### 二、python重定向
+
+print 重定向：
+
+```python
+memo = cStringIO.StringIO(); serr = sys.stderr; file = open('out.txt', 'w+')
+print >>memo, 'StringIO'; print >>serr, 'stderr'; print >>file, 'file'
+print >>None, memo.getvalue()
+```
+
+sys.stdout重定向：
+
+```python
+import sys
+savedStdout = sys.stdout  #保存标准输出流
+with open('out.txt', 'w+') as file:
+    sys.stdout = file  #标准输出重定向至文件
+    print 'This message is for file!'
+
+sys.stdout = savedStdout  #恢复标准输出流
+print 'This message is for screen!'
+```
+
+
+
+## 2019-05-15
+
+### 一、StanfordNLP使用小结
+
+StanfordNER主页：<https://nlp.stanford.edu/software/CRF-NER.html>
+
+在这里，介绍了StanfordNER的使用及相关工具，包括如何启动自测的服务器和客户端。
+
+StanfordNER Q&A：<https://nlp.stanford.edu/software/crf-faq.shtml#j>
+
+在这里，介绍了关于CRF的一些常见问题，我主要参考这里解决了如何建字典的问题。
+
+详细实例操作：<http://www.davidsbatista.net/blog/2018/01/23/StanfordNER/>
+
+在这里，作者David S. Batiasta详细介绍了如何使用StanfordNER训练模型的流程，给我提供了巨大帮助。
+
+PyNER工具：<https://github.com/dat/pyner>
+
+这里是辅助搭建服务器的工具包，使用它可以很方便地获取模型测试的结果（特别是在字典较大>200M时，如果不使用，每跑一个query耗时十秒以上，使用后仅几十毫秒）。
+
+
+
+### 二、linux查看当前进程的输出
+
+linux使用命令strace
+
+```sh
+strace -e trace=write -s 200 -p 12690
+```
+
+-p指定进程号，trace=write表示查看所有系统调用的写操作，trace=all表示查看所有系统调用。
+
+
+
+### 三、linux输出重定向
+
+```
+command 1> file1 2> file2
+```
+
+将标准输出到file1，将标准错误输出输出到file2；
+
+```sh
+command 1> file1 2> &1
+```
+
+&1表示1输出通道，上述式将标准输出和错误输出都输出到file1。
+
+```sh
+command &> file1
+```
+
+&>表示将标准输出和错误输出定位到同一位置，从效果上来说等同于前一命令。
+
+```
+command &> /dev/null
+```
+
+/dev/null是一个文件，这个文件比较特殊，所有传给它的东西它都丢弃掉。
+
