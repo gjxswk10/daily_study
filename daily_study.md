@@ -4613,3 +4613,37 @@ command &> /dev/null
 1. 首先对比正常机器的日志、故障机器出故障以前的日志、故障后的日志，确定哪一行可能是最重要的错误信息；按照这个思路，我定位了日志中多个输出点，比如qdb_connection、BRAIN、ans、Can't parse vserver01.voice.sjs.ted，到最后正确的"Can't parse vr.info"。
 2. 定位到这一步后，说明有文件或者模块没有加载起来，需要定位到这里，但奇怪的是，文件路径、设置等都是正常的，我甚至把正常机器上的文件copy了一份重新运行，仍无结果；我怀疑是系统编码的问题，但与正常机器对比后，发现仍是正常的；考虑过很多种可能，甚至从时间线上考虑所有的可能，无果。最后，没办法，决定看源代码，因为不知道模块怎么加载的话很难准确定位到问题。
 3. 打开代码路径，发现没有权限，又学习了在公司申请svn权限的流程。之后，根据日志输出，顺藤摸瓜地定位到了问题，文件打开错误造成的，检查了一遍文件名发现还是正常的；最后上网搜索，查询文件读写异常可能的原因，看到***读写权限***这四个大字后我瞬间明白了。问题遂解决。
+
+
+
+## 2019-05-28
+
+### 一、文本标注工具：BRAT
+
+参考链接：<https://blog.csdn.net/everlasting_188/article/details/79962947>
+
+
+
+### 二、中文字向量下载
+
+#### 1. 100+ Chinese Word Vectors 上百种预训练中文词向量：
+
+引用：Shen Li, Zhe Zhao, Renfen Hu, Wensi Li, Tao Liu, Xiaoyong Du, [*Analogical Reasoning on Chinese Morphological and Semantic Relations*](http://aclweb.org/anthology/P18-2023), ACL 2018.
+
+github地址：<https://github.com/Embedding/Chinese-Word-Vectors>
+
+
+
+#### 2. bert-as-service
+
+bert开源代码：https://github.com/google-research/bert
+
+肖涵博士，bert-as-service
+
+github地址：<https://github.com/hanxiao/bert-as-service#Benchmark>
+
+
+
+#### 三、中文知识图谱
+
+复旦KW实验室来源：http://kw.fudan.edu.cn/apis/probaseplus/ (KW Lab, Fudan University)
