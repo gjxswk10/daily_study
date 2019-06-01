@@ -711,14 +711,14 @@ $ sort file | uniq
 $ sort file | uniq –u
 上面的命令可以把重复的行全部去掉，也就是文件中的非重复行！
 
-##2018-05-26
+## 2018-05-26
 
 java.net.UnknownHostException: xxx: 未知的名称或服务
 这是由于本地域名localhost未解析造成的。我出该问题的机器是nmyjs_105_106,
 将它映射到127.0.0.1上即可，即在/etc/hosts添加一行：
 127.0.0.1 nmyjs_105_106 localhost
 
-##2018-06-05
+## 2018-06-05
 
 ```
 pip --default-timeout=100 （设置延迟时间） -i https://pypi.tuna.tsinghua.edu.cn/simple (设置源）--ignore-installed ipython (忽略包针）
@@ -4540,3 +4540,180 @@ java here.HelloWorld
 
 
 
+## 2019-05-09
+
+### 一、vim 显示乱码
+
+一开始以及是系统设置字体的原因，但没生效，实际上是vim本身的原因，设置vim的中文字体即可。
+
+编辑~/.vimrc，然后在其中加入：
+
+```
+set fileencodings=ucs-bom,utf-8,gbk,gb2312,cp936,gb18030,big5,latin-1
+set encoding=utf-8
+set termencoding=utf-8
+set fileencoding=utf-8
+```
+
+到这里，对于遇到的Case仍然没有得到解决。
+
+最后才搞清楚原因，原文件是GBK编码的，但即便是用gb18030其中仍然也会存在乱码，这个时候，vim会使用兜底的latin-1来显示中文字符，所以无论怎么调整编码依旧无效。所以可以使用iconv强制转码：
+
+```sh
+iconv -c -f gb18030 -t utf8 [filename] > [output]
+```
+
+其中-c表示忽略不能转码的部分。最终再用vim打开即可。
+
+
+
+## 2019-05-14
+
+### 一、python执行linux系统命令：
+
+```python
+r = os.system("ls .")
+# r: 系统命令执行状态，0表示正常
+r = os.popen("ls .")
+# r: 为命令的执行结果，保存在类文件读写对象里
+for line in r:
+  print line
+# 这样可以读出每一行命令
+```
+
+
+
+### 二、python重定向
+
+print 重定向：
+
+```python
+memo = cStringIO.StringIO(); serr = sys.stderr; file = open('out.txt', 'w+')
+print >>memo, 'StringIO'; print >>serr, 'stderr'; print >>file, 'file'
+print >>None, memo.getvalue()
+```
+
+sys.stdout重定向：
+
+```python
+import sys
+savedStdout = sys.stdout  #保存标准输出流
+with open('out.txt', 'w+') as file:
+    sys.stdout = file  #标准输出重定向至文件
+    print 'This message is for file!'
+
+sys.stdout = savedStdout  #恢复标准输出流
+print 'This message is for screen!'
+```
+
+
+
+## 2019-05-15
+
+### 一、StanfordNLP使用小结
+
+StanfordNER主页：<https://nlp.stanford.edu/software/CRF-NER.html>
+
+在这里，介绍了StanfordNER的使用及相关工具，包括如何启动自测的服务器和客户端。
+
+StanfordNER Q&A：<https://nlp.stanford.edu/software/crf-faq.shtml#j>
+
+在这里，介绍了关于CRF的一些常见问题，我主要参考这里解决了如何建字典的问题。
+
+详细实例操作：<http://www.davidsbatista.net/blog/2018/01/23/StanfordNER/>
+
+在这里，作者David S. Batiasta详细介绍了如何使用StanfordNER训练模型的流程，给我提供了巨大帮助。
+
+PyNER工具：<https://github.com/dat/pyner>
+
+这里是辅助搭建服务器的工具包，使用它可以很方便地获取模型测试的结果（特别是在字典较大>200M时，如果不使用，每跑一个query耗时十秒以上，使用后仅几十毫秒）。
+
+
+
+### 二、linux查看当前进程的输出
+
+linux使用命令strace
+
+```sh
+strace -e trace=write -s 200 -p 12690
+```
+
+-p指定进程号，trace=write表示查看所有系统调用的写操作，trace=all表示查看所有系统调用。
+
+
+
+### 三、linux输出重定向
+
+```
+command 1> file1 2> file2
+```
+
+将标准输出到file1，将标准错误输出输出到file2；
+
+```sh
+command 1> file1 2> &1
+```
+
+&1表示1输出通道，上述式将标准输出和错误输出都输出到file1。
+
+```sh
+command &> file1
+```
+
+&>表示将标准输出和错误输出定位到同一位置，从效果上来说等同于前一命令。
+
+```
+command &> /dev/null
+```
+
+/dev/null是一个文件，这个文件比较特殊，所有传给它的东西它都丢弃掉。
+
+
+
+## 2019-05-24
+
+### 一、语音助手debug
+
+从上上周开始，遇到了语音助手的两个bug，颇耗费了不少精力。之所以debug困难，一是因为我对这个项目几乎零了解；其二是代码除了运行脚本外全是用C实现的，在本地机器上只能看到编译的库，而看不到代码的实现；其三是如果从改代码bug的角度来调试，能不能保证编译运行通过先不说，找bug也是很困难的。总而言之，对于这样一个黑盒的项目，我只能从外围进行调整，说起来，这也是我第一次进行这样的黑盒项目的debug工作。
+
+第一个bug是因为日志写满磁盘空间造成的，当时打出df -hl看到100%的空间使用率时意识到了这个问题。解决方法是写个定时清理日志的脚本。
+
+第二个bug几乎花费了我一周的时间去解决。解决步骤：
+
+1. 首先对比正常机器的日志、故障机器出故障以前的日志、故障后的日志，确定哪一行可能是最重要的错误信息；按照这个思路，我定位了日志中多个输出点，比如qdb_connection、BRAIN、ans、Can't parse vserver01.voice.sjs.ted，到最后正确的"Can't parse vr.info"。
+2. 定位到这一步后，说明有文件或者模块没有加载起来，需要定位到这里，但奇怪的是，文件路径、设置等都是正常的，我甚至把正常机器上的文件copy了一份重新运行，仍无结果；我怀疑是系统编码的问题，但与正常机器对比后，发现仍是正常的；考虑过很多种可能，甚至从时间线上考虑所有的可能，无果。最后，没办法，决定看源代码，因为不知道模块怎么加载的话很难准确定位到问题。
+3. 打开代码路径，发现没有权限，又学习了在公司申请svn权限的流程。之后，根据日志输出，顺藤摸瓜地定位到了问题，文件打开错误造成的，检查了一遍文件名发现还是正常的；最后上网搜索，查询文件读写异常可能的原因，看到***读写权限***这四个大字后我瞬间明白了。问题遂解决。
+
+
+
+## 2019-05-28
+
+### 一、文本标注工具：BRAT
+
+参考链接：<https://blog.csdn.net/everlasting_188/article/details/79962947>
+
+
+
+### 二、中文字向量下载
+
+#### 1. 100+ Chinese Word Vectors 上百种预训练中文词向量：
+
+引用：Shen Li, Zhe Zhao, Renfen Hu, Wensi Li, Tao Liu, Xiaoyong Du, [*Analogical Reasoning on Chinese Morphological and Semantic Relations*](http://aclweb.org/anthology/P18-2023), ACL 2018.
+
+github地址：<https://github.com/Embedding/Chinese-Word-Vectors>
+
+
+
+#### 2. bert-as-service
+
+bert开源代码：https://github.com/google-research/bert
+
+肖涵博士，bert-as-service
+
+github地址：<https://github.com/hanxiao/bert-as-service#Benchmark>
+
+
+
+#### 三、中文知识图谱
+
+复旦KW实验室来源：http://kw.fudan.edu.cn/apis/probaseplus/ (KW Lab, Fudan University)
