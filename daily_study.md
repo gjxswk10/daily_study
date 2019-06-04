@@ -4647,3 +4647,13 @@ github地址：<https://github.com/hanxiao/bert-as-service#Benchmark>
 #### 三、中文知识图谱
 
 复旦KW实验室来源：http://kw.fudan.edu.cn/apis/probaseplus/ (KW Lab, Fudan University)
+
+
+
+## 2019-06-04
+
+### 一、文件同时读写的脚本错误
+
+在BRAT标注系统上搭的定时脚本，由于之前设置的两个脚本，同一时刻对同一份配置文件config.yml，同时读和写，导致今天早上发现，今天导出的数据和昨天是完全一样的。查了下原因发现，是其中一个脚本的更新config.yml操作连续几天没有成功导致的。
+
+因此，在此记录下，对同一份文件同时进行写操作（读操作暂时没发现）可能会带来问题，解决方法一是错开脚本的执行时间，二是自己管理这两个脚本，有程序内解决。
