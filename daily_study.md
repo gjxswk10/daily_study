@@ -4772,3 +4772,50 @@ ll -h /proc/160823/fd
 
 
 
+## 2019-06-24
+
+### 一、redis安装配置
+
+### 1. redis server安装
+
+参考官网：https://redis.io/download
+
+```shell
+$ wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+$ tar xzf redis-5.0.5.tar.gz
+$ cd redis-5.0.5
+$ make
+# start
+$ src/redis-server
+# interact using client
+$ src/redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+```
+
+redis server配置，在文件redis.conf中，具体参考网址：https://www.runoob.com/redis/redis-conf.html
+
+
+
+## 2019-06-24
+
+### 一、linux命令cp如何强制覆盖
+
+用cp -f 命令拷贝数据时发现仍然不能强制覆盖，查了一下是因为系统默认cp=cp -i，所以会询问，-f参数相当于没有用。因此，使用下面的命令强制覆盖
+
+```sh
+/bin/cp -f src dec
+```
+
+## 2019-06-26
+
+### 一、shell dirname小记
+
+```shell
+path="/search/odin"
+cur_dir=$(dirname "$path")
+```
+
+之前写成cur_dir=$(dirname ​\$path)，没有加引号，始终得不到想要的结果。
