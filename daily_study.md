@@ -4888,9 +4888,23 @@ SYSFONT="latarcyrheb-sun16"
 
 
 
+## 2019-07-07
 
+### 一、统计文档中某字符串出现次数
 
+```shell
+#测试结果如下：
+$ cat test
+select select
+select
 
+$ grep -o 'select' test | wc -l
+3
 
+$ awk -v RS="@#$j" '{print gsub(/select/,"&")}' test
+3
 
+$ awk  '{s+=gsub(/select/,"&")}END{print s}' test
+3
+```
 
