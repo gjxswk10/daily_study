@@ -4908,3 +4908,18 @@ $ awk  '{s+=gsub(/select/,"&")}END{print s}' test
 3
 ```
 
+
+
+## 2019-07-11
+
+### 一、linux系统下文件的批量引用
+
+批量引用batch_04.txt到batch_10.txt的文件，如：
+
+```shell
+touch batch_{04..10}.txt
+cat batch_{04..10}.txt
+rename 's/\.txt/\.c/' *.txt
+```
+
+最后一个是linux文件改名指令之一，使用正则表达式即可。
