@@ -3915,6 +3915,8 @@ Java HotSpot(TM) 64-Bit Server VM (build 12.0.1+12, mixed mode, sharing)
 
 训练自己的模型参考：<https://blog.sicara.com/train-ner-model-with-nltk-stanford-tagger-english-french-german-6d90573a9486>
 
+NER features: https://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/ie/NERFeatureFactory.html
+
 
 
 ## 2019-04-24
