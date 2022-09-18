@@ -2290,6 +2290,10 @@ cpu缓存：合理的利用cpu cache可以极大的提高代码的运行效率(�
 
 std::move操作: 当不得不进行深拷贝时，如果深拷贝数据源在拷贝后就不在使用，尽可能的用move操作代替，或者在参数传递时用move操作代替临时的实参变量。
 
+####6. 递归函数的参数设计
+
+要仔细考虑递归函数的参数，尤其是返回参数，void的返回型最好，若是返回一个vector类型的这类函数，一定要考虑把递归的部分用void返回型替代。(2020-09-16)
+
 ## 2019-01-10
 
 ### 一、Kickstart Round E 2018
@@ -2888,8 +2892,9 @@ S(A)表示对矩阵A能取得的最大奖励；min(A)表示矩阵A中的最小�
 
 * 记$DP(i, j)$表示到达第i个城市，在此之前已经参观过j个城市的最早时间；则容易知道：
 
-  $$ DP(i + 1, j) = min\{DP(i, j - 1) + TS(i, DP(i, j - 1)) + T_s, DP(i, j) + TS(i, DP(i,j))\}$$
-
+  $$
+  DP(i + 1, j) = min\{DP(i, j - 1) + TS(i, DP(i, j - 1)) + T_s, DP(i, j) + TS(i, DP(i,j))\}
+  $$
   上述式中TS(i, v)表示v时刻开始在i城市等候列车，到达下一个城市所需要的时间；
 
 * 最终输出$max \ i, s.t. \{DP(N, i) < T_f\}$即可；
@@ -3141,13 +3146,14 @@ FF
 
 接下来是N=2的情形。小明知道甲和已两个人的答案，容易知道，需要先对照二人的结果来确定正确答案的可能分布。同样的，设甲和已相同作答的有L道题，不同的有R道题，且甲得分为K, 已得分为H。那么设相同部分甲和已都得了x分，不同部分甲得了y分，那么已一定得了R-y分。对应不同分数可以得到以下方程：
 
-$$ \left\{
+$$
+\left\{
 \begin{aligned}
 x + y & = K \\
 x + R - y & = H \\
 \end{aligned}
-\right.$$
-
+\right.
+$$
 从而可以分别解出x和y，故此，我们得到了分成两部分的答案和对应的得分，将这个已知对应到N=1的情形，即是相当于知道了另一个人其中L题的得分和答案，以及另外R题的得分和答案。因此再使用N=1的情形，对照小明自己的答案，即可得到自己的可能最大分数了。
 
 
@@ -3231,7 +3237,7 @@ L=2的情况，数组中的仅有两个数，分别是最小值和最大值，�
 
 关于曼哈顿距离的一道题。R*C的矩阵上有若干邮局，用1表示，没有邮局用0表示。非邮局点到邮局的邮递距离用$A_i$表示，其值为该点到所有邮局点中最小的曼哈顿距离。
 
-定义全局的邮递距离为$S_i$，为所有非邮局点的邮递距离中的最大值。
+定义全局的邮递距离为$S_i$，为所有非邮局点的邮递距离中的最大值.
 
 问题是：给定当前的R*C矩阵（即邮局分布），接下来，在矩阵中将选择一个非邮局点，使得新的邮局分布的全局邮递距离最小，问这个最小的全局邮递距离是多少？
 
@@ -4925,3 +4931,354 @@ rename 's/\.txt/\.c/' *.txt
 ```
 
 最后一个是linux文件改名指令之一，使用正则表达式即可。
+
+## 2020-09-15
+
+### 一、C++中关于string类型的坑 
+  for (int i = 0; i < a.length() - b.length(); ++i)
+  当a的长度为1，b的长度为2时,循环并没有马上结束，这是因为length()的返回类型是size_t，是unsigned的。因此需要用int转换才行。
+
+
+
+## 2021-04-16
+
+### 一、树的遍历
+
+今天复习及背诵树遍历的迭代板方法，以便后续使用。
+
+#### 先序遍历
+
+```c++
+// 先序遍历
+void travelPrev(TreeNode* p) {
+    stack<TreeNode*> st;
+    st.push(p);
+    while (!st.empty()) {
+        auto x = st.top(); st.pop();
+        while (x) {
+            visit(x);
+            if (x->right) st.push(x->right);
+            x = x->left;
+        }
+    }
+}
+```
+
+
+
+#### 中序遍历
+
+```c++
+void travelIn(TreeNode* p) {
+    stack<TreeNode*> st;
+    auto x = p;
+    while (true) {
+        while (x) st.push(x), x = x->left;
+        if (st.empty()) break;
+        x = st.top(); st.pop(); visit(x);
+        x = x->right;
+    }
+}
+```
+
+#### 后序遍历
+
+```c++
+void travelPost(TreeNode* p) {
+    stack<TreeNode*> st;
+    st.push(p);
+    auto x = p;
+    while (!st.empty()) {
+        auto f = st.top();
+        if (f->left != x && f->right != x) {
+            while (f) {
+                if (f->left) {
+                    if (f->right) st.push(f->right);
+                    f = f->left;
+                } else f = f->right;
+                if (f) st.push(f);
+            }
+        }
+        x = st.top(); st.pop(); visit(x);
+    }
+}
+```
+
+
+
+#### 层次遍历
+
+```c++
+void travelLevel(TreeNode* p) {
+    queue<TreeNode*> q;
+    q.push(p); 
+    while (!q.empty()) {
+        int n = q.size(), i = 0;
+        while (i++ < n) {
+            auto x = q.front(); q.pop(); visit(x);
+            if (x->left) q.push(x->left);
+            if (x->right) q.push(x->right);
+        }
+    }
+}
+```
+
+
+
+### 二、排列组合的生成
+
+
+
+背诵排列及组合的生成方法。
+
+####  无重复元素的全排列
+
+
+
+```c++
+// 假设nums已经排好序
+void permulate(vector<int> nums, int st) { // 不传引用，这样能得到按顺序的排列，也无须回溯；当然也可以使用传引用+标记的方法，此处仅使用最简洁代码
+    if (st == n) do_with_permulate(); // 当前nums数组即为当前排列
+    for (int i = st; i < nums.size(); ++i) {
+        swap(nums[i], nums[st]);	// 交换当前元素与当前占位元素
+        permulate(nums, st + 1); 
+    }
+}
+```
+
+
+
+#### 有重复元素的全排列
+
+```c++
+// 假设nums已经排好序
+void permulate(vector<int> nums, int st) { // 不传引用，这样能得到按顺序的排列，也无须回溯；当然也可以使用传引用+标记的方法，此处仅使用最简洁代码
+    if (st == n) do_with_permulate(); // 当前nums数组即为当前排列
+    for (int i = st, bf = INT_MIN; i < nums.size(); ++i) {
+        if (bf == nums[i]) continue;
+        bf = nums[i]; // bf记录上一个占位元素，防止重复
+        swap(nums[i], nums[st]);	// 交换当前元素与当前占位元素
+        permulate(nums, st + 1); 
+    }
+}
+```
+
+
+
+#### 无重复元素生成组合数
+
+1~n的数组生成k个数的组合。
+
+```c++
+vector<vector<int>> ans;
+vector<int> path;
+
+void gen(int n, int k) {
+  if (n < k) return;
+  // not select n
+  gen(n - 1, k); 
+  // backtrack: select n
+  path.push_back(n);
+  if (k == 1) ans.push_back(path);
+  else gen(n - 1, k - 1); 
+  path.pop_back();
+}
+
+vector<vector<int>> combine(int n, int k) {
+  gen(n, k); 
+  return ans;
+}
+```
+
+
+
+
+
+#### 重复元素生成组合
+
+以leetcode 40（39类似）为i例，主要是回溯的方法。
+
+```c++
+vector<vector<int>> ans;
+vector<int> path;
+map<int,int> dm; // map去重并计数
+vector<int> uq; // 保留去重后的结果
+int N;
+
+void combine(int tg, int st) {
+    if (st == N) return;
+    if (tg < uq[st]) return;
+    int i = 0;
+    for (; i <= dm[uq[st]]; ++i) { // 遍历尝试当前0～元素最大次数，注意加等号
+        if (i * uq[st] < tg) combine(tg - i * uq[st], st + 1); 
+        else {
+            if (i * uq[st] == tg) ans.push_back(path);
+            break;
+        }
+        path.push_back(uq[st]);
+    }   
+    while (i--) path.pop_back();
+}
+
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+  for (auto v: candidates) ++dm[v];
+  for (auto [k, v]: dm) uq.emplace_back(k);
+  N = dm.size();
+  combine(target, 0); 
+  return ans;
+}
+
+```
+
+另一种写法(Leetcode 90)： [leetcode 90](https://leetcode.com/problems/subsets-ii/)
+
+```c++
+vector<vector<int>> res;
+vector<int> path;
+
+void gen(vector<int> nums, int st) {
+  if (st == nums.size()) { res.push_back(path); return; }
+  int cnt = 1;
+  while (st + cnt < nums.size() && nums[st + cnt] == nums[st]) ++cnt;
+  for (int i = 0; i <= cnt; ++i) {
+    gen(nums, st + cnt);
+    path.push_back(nums[st]);
+  }
+  for (int i = 0; i <= cnt; ++i) path.pop_back();
+}
+
+vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+  sort(nums.begin(), nums.end());
+  gen(nums, 0); 
+  return res;
+}
+```
+
+一种较好的方法：
+
+```c++
+vector<vector<int>> res;
+vector<int> ans;
+
+void gen(vector<int>& nums, int tg, int st) {
+    if (tg == 0) {
+        res.push_back(ans);
+        return;
+    }   
+    for (int i = st; i < nums.size() && nums[i] <= tg; ++i) {
+        if (i == st || nums[i] != nums[i - 1]) {
+            ans.push_back(nums[i]);
+            tg -= nums[i]; // 不把tg - nums[i]写到回溯函数里，这样更快
+            gen(nums, tg, i + 1); 
+            tg += nums[i];
+            ans.pop_back();
+        }
+    }   
+}
+
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+    sort(candidates.begin(), candidates.end());
+    gen(candidates, target, 0); 
+    return res;
+}
+
+```
+
+
+
+#### 排列组合综合题
+
+以leetcode 1079题为例。
+
+[leetcode 1079. Letter Tile Possibilities](https://leetcode.com/problems/letter-tile-possibilities/)
+
+很多题经常考的一种组合，人选箱 过是 箱选人。一般情况下，递归函数体里选循环次数少的。
+
+```c++
+unordered_map<int,int> dm; 
+vector<int> cm; 
+int pn = 0, ans, N;
+void helper(int r) {
+    for (int i = 0; i < cm.size(); ++i) {
+        if (dm[cm[i]]) {
+            --dm[cm[i]];
+            if (r < N) ++ans;
+            if (r < N - 1) helper(r + 1); 
+            ++dm[cm[i]];
+        }
+    }   
+}
+int numTilePossibilities(string tiles) {
+    N = tiles.size();
+    for (auto c: tiles) ++dm[c];
+    for (auto [k, v]: dm) cm.push_back(k);
+    pn = 0, ans = 0;
+    helper(0);
+    return ans;
+}
+```
+
+
+
+
+
+
+
+## 2021-04-17
+
+### 一、KMP算法
+
+```c++
+// KMP生成自匹配串
+vector<int> build_kmp(string s) {
+    int n = s.length();
+    vector<int> p[n]; 
+    int j = 0, t = p[0] = -1;
+    while (j < n - 1) {
+        if (j < 0 || s[j] == s[t]) {
+            ++j, ++t;
+            p[j] = p[j] == p[t] ? p[t] : t;
+        } else t = p[t];
+    }
+    return p;
+}
+
+// 主函数
+int match(string a, string b) {
+    int m = a.length(), n = b.length();
+    if (m < n) return match(b, a); // 选择较短串为模式串
+    vector<int> p = build_kmp(b); 
+    int i = 0, j = 0; // 双串各自的指针
+    while (i < m && j < n) {
+        if (j < 0 || a[i] == b[j]) ++i, ++j;
+        else j = p[j];
+    }
+    return i - j; // 返回最后一次匹配时模式串的初始位置；i - j <= m - n 则表示匹配成功，否则失配
+}
+```
+
+
+
+### 二、最长回文子串算法Manacher算法
+
+```c++
+// 返回arr对应于扩展字符串的回文半径，arr[i] - 1则表示该处的实际最长回文子串
+vector<int> mana(string s) {
+    int n = s.length(), m = n << 1 | 1;
+    string ss(m, '*'); for (int i = 0; i < n; ++i) ss[i<<1|1] = s[i];
+    vector<int> arr(m); int C = -1, R = 0;
+    for (int i = 0; i < m; ++i) {
+        arr[i] = 0 < C * 2 - i ? min(R - i, arr[C * 2 - i]) : 1;
+        while (0 <= i - arr[i] && i + arr[i] < m 
+            && ss[i + arr[i]] == ss[i - arr[i]]) 
+            ++arr[i];
+        if (R < arr[i] + i) C = i, R = i + arr[i];
+    }   
+    return arr;
+}
+
+// 例：aacabadefeda 生成arr: 1 2 3 2 1 4 1 2 1 4 1 2 1 2 1 2 1 8 1 2 1 2 1 2 1 
+```
+
+
+
