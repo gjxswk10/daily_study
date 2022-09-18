@@ -4952,7 +4952,7 @@ rename 's/\.txt/\.c/' *.txt
 // 先序遍历
 void travelPrev(TreeNode* p) {
     stack<TreeNode*> st;
-    st.push(p);
+    if (p) st.push(p);
     while (!st.empty()) {
         auto x = st.top(); st.pop();
         while (x) {
