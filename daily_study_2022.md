@@ -745,6 +745,8 @@ T(n) = aT(n/b) + f(n)
 
    1.7 输入输出是否加了不必要的东西；
 
+   1.8 定义了全局变量M后，又在int n , M = n / k；以为全局变量设置好了。	
+
 2. 变与不变型
 
    2.1 循环中哪些值该变，哪些值不该变；是不是把不该变的变了，或者相反；
@@ -871,6 +873,570 @@ dp[i] = {dp[p1]*a1, dp[p2]*a2,dp[p3]*a3, ... , dp[pn]*an};
 
 类似问题容易混淆，容易搞不清楚代码逻辑，宜多做总结。
 
+（add in 2022-10-22）
+
+#### 1. Leetcode 1723: [Find Minimum Time to Finish All Jobs](https://leetcode.cn/problems/find-minimum-time-to-finish-all-jobs/)
+
+Description:
+
+```
+You are given an integer array jobs, where jobs[i] is the amount of time it takes to complete the ith job.
+
+There are k workers that you can assign jobs to. Each job should be assigned to exactly one worker. The working time of a worker is the sum of the time it takes to complete all jobs assigned to them. Your goal is to devise an optimal assignment such that the maximum working time of any worker is minimized.
+
+Return the minimum possible maximum working time of any assignment. 
+```
+
+Example:
+
+```
+Input: jobs = [1,2,4,7,8], k = 2
+Output: 11
+Explanation: Assign the jobs the following way:
+Worker 1: 1, 2, 8 (working time = 1 + 2 + 8 = 11)
+Worker 2: 4, 7 (working time = 4 + 7 = 11)
+The maximum working time is 11.
+
+来源：力扣（LeetCode）
+链接：https://leetcode.cn/problems/find-minimum-time-to-finish-all-jobs
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+```
+
+问题看起来像是：n个元素分成k组，求：每组和的最大值，使其最小的方案。
+
+方法一：（比较符合我原先思维的解决方案）
+
+方案一是“人选箱”的思路，对每一个id编号的箱子（此处为job），选择一个合适的人去执行它。
+
+```c++
+int helper(vector<int>& jobs, int id, vector<int>& load, int k) {
+    int n = jobs.size(), m = load.size();
+    if (n - id == k) { // 题目规定: k <= n，因此这一条可以判断递归终点，可以计算当前方案的结果
+        int res = 0;
+        for (int i = id; i < n; ++i) res = max(res, jobs[i]);
+        for (int i = 0; i < m; ++i) {
+            if (load[i]) res = max(res, load[i]);
+            else break;
+        }
+        return res;
+    }   
+    int res = INT_MAX;
+    for (int i = 0; i < m; ++i) {
+        if (0 < i && !load[i - 1]) break;
+        int bk = load[i] ? k : k - 1; // 判断剩下的箱子数
+        load[i] += jobs[id];
+        res = min(res, helper(jobs, id + 1, load, bk)); // 递归回溯
+        load[i] -= jobs[id]; // 回溯，清标志
+    }   
+    return res;
+}
+int minimumTimeRequired(vector<int>& jobs, int k) {
+    vector<int> load(k);
+    return helper(jobs, 0, load, k); 
+}
+```
+
+方法二：二分
+
+因为结果的上下限容易计算，所以核心就是判断：能否有方案使得结果=v可行。
+
+这里比较巧妙且核心的地方就是：用dp计算res=v的方案是否可行。
+
+dp[n] = min(dp(m))，m是n的子集；
+
+这里是“贪心算法”的思想，对于当前数n，取剩余箱子最多，或者一样多时，取剩余值最大的方案。
+
+```c++
+bool can_split(vector<int>& jobs, int n, int k, int v) {
+    int tot = 1 << n;
+    vector<pair<int,int>> dp(tot);
+    dp[0] = {k, v}; 
+    for (int i = 0; i < tot; ++i) {
+        int x = dp[i].first, y = dp[i].second;
+        printf("i: %d, x: %d, y: %d\n", i, x, y); 
+        for (int j = 0; j < n; ++j) {
+            if ((i & (1 << j)) == 0) {
+                int now = i | (1 << j);
+                int val = jobs[j], xx = x, yy = y;
+                if (v < val) return false;
+                if (val < y) yy = y - val;
+                else if (val == y) --xx, yy = v;
+                else --xx, yy = v - val;
+                int a = dp[now].first, b = dp[now].second;
+                if (a < xx || (a == xx && b < yy)) dp[now] = {xx, yy}; 
+            }
+        }
+    }
+    int ax = dp[tot - 1].first, bx = dp[tot - 1].second;
+    return ax != 0 || (ax == 0 && bx == v);
+}
+
+int minimumTimeRequired(vector<int>& jobs, int k) {
+    int n = jobs.size(), s = accumulate(jobs.begin(), jobs.end(), 0);
+    int lo = s / k, hi = s + 1;
+    while (lo < hi) {
+        int md = (lo + hi) >> 1; 
+        if (can_split(jobs, n, k, md)) hi = md;
+        else lo = md + 1;
+    }
+    return lo;
+}
+```
+
+方法三：mask子集技巧
+
+```c++
+#define L 10000
+#define M 20
+vector<vector<int>> dp(L, vector<int>(M));
+int helper(int mask, int id, int k, vector<int>& mv) {
+    if (dp[mask][id]) return dp[mask][id];
+    if (!mask) return dp[mask][id] = INT_MAX;
+    if (id + 1 == k) return dp[mask][id] = mv[mask];
+    int res = INT_MAX;
+    for (int i = mask; i; i = mask & (i - 1)) {
+        //PR(i); PR(mask - i); PR(mv[i]);
+        int c = max(mv[i], helper(mask - i, id + 1, k, mv));
+        res = min(res, c); 
+    }   
+    return dp[mask][id] = res;
+}
+int minimumTimeRequired(vector<int>& jobs, int k) {
+    int n = jobs.size(), mask = (1 << n); 
+    vector<int> mv(mask + 1); 
+    for (int i = 1; i < mask; ++i) {
+        for (int j = n - 1; 0 <= j; --j) {
+            if (i & (1 << j)) {
+                mv[i] = mv[i - (1 << j)] + jobs[j];
+                break;
+            }
+        }
+    }   
+    return helper(mask - 1, 0, k, mv);
+}
+```
+
+#### 2. Leetcode 857:[Minimum Cost to Hire K Workers](https://leetcode.cn/problems/minimum-cost-to-hire-k-workers/)
+
+问题描述
+
+```
+There are n workers. You are given two integer arrays quality and wage where quality[i] is the quality of the ith worker and wage[i] is the minimum wage expectation for the ith worker.
+
+We want to hire exactly k workers to form a paid group. To hire a group of k workers, we must pay them according to the following rules:
+
+    Every worker in the paid group should be paid in the ratio of their quality compared to other workers in the paid group.
+    Every worker in the paid group must be paid at least their minimum wage expectation.
+
+Given the integer k, return the least amount of money needed to form a paid group satisfying the above conditions. Answers within 10-5 of the actual answer will be accepted.
+
+来源：力扣（LeetCode）
+链接：https://leetcode.cn/problems/minimum-cost-to-hire-k-workers
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+```
+
+样例：
+
+```
+Input: quality = [3,1,10,10,1], wage = [4,8,2,2,7], k = 3
+Output: 30.66667
+Explanation: We pay 4 to 0th worker, 13.33333 to 2nd and 3rd workers separately.
+
+来源：力扣（LeetCode）
+链接：https://leetcode.cn/problems/minimum-cost-to-hire-k-workers
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+```
+
+本质上并非排列组合问题。用优先级队列统计最小和即可：
+
+```c++
+double mincostToHireWorkers(vector<int>& quality, vector<int>& wage, int k) {
+    int n = quality.size();
+    vector<int> qr(n);
+    iota(qr.begin(), qr.end(), 0); 
+    sort(qr.begin(), qr.end(), [&](int a, int b) {
+        return wage[a] * quality[b] < wage[b] * quality[a];
+    }); 
+    priority_queue<int> q;
+    int sum = 0;
+    for (int i = 0; i < k; ++i) {
+        int rk = qr[i];
+        q.push(quality[rk]);
+        sum += quality[rk];
+    }   
+    int p = qr[k - 1]; 
+    double res = (double) wage[p] * sum / quality[p];
+    for (int i = k; i < n; ++i) {
+        int t = q.top(), rk = qr[i]; q.pop();
+        sum += quality[rk] - t;
+        res = min(res, (double) wage[rk] * sum / quality[rk]);
+        q.push(quality[rk]);
+    }
+    return res;
+}
+```
+
+#### 3. Leecode 1986:[Minimum Number of Work Sessions to Finish the Tasks](https://leetcode.cn/problems/minimum-number-of-work-sessions-to-finish-the-tasks/)
+
+问题描述：
+
+```
+There are n tasks assigned to you. The task times are represented as an integer array tasks of length n, where the ith task takes tasks[i] hours to finish. A work session is when you work for at most sessionTime consecutive hours and then take a break.
+
+You should finish the given tasks in a way that satisfies the following conditions:
+
+    If you start a task in a work session, you must complete it in the same work session.
+    You can start a new task immediately after finishing the previous one.
+    You may complete the tasks in any order.
+
+Given tasks and sessionTime, return the minimum number of work sessions needed to finish all the tasks following the conditions above.
+
+The tests are generated such that sessionTime is greater than or equal to the maximum element in tasks[i].
+```
+
+样例：
+
+```
+Input: tasks = [3,1,3,1,1], sessionTime = 8
+Output: 2
+Explanation: You can finish the tasks in two work sessions.
+- First work session: finish all the tasks except the last one in 3 + 1 + 3 + 1 = 8 hours.
+- Second work session: finish the last task in 1 hour.
+```
+
+方法一、箱选人
+
+顾名思义，考查满足当前箱子的条件，然后递归回溯下一个箱子；比较方便用dp记录状态；
+
+```c++
+#define L 20000
+#define M 20
+int K;
+int dp[L][M];
+int helper(vector<int>& tasks, int k, int mask) {
+    int n = tasks.size(), res = n << 1;
+    if (!mask) return k == K ? 0 : 1;
+    if (dp[mask][k]) return dp[mask][k];
+    for (int i = 0; i < n; ++i) {
+        if (mask & (1 << i)) {
+            int nmask = mask ^ (1 << i); 
+            if (tasks[i] < k) {
+                res = min(res, helper(tasks, k - tasks[i], nmask));
+            } else if (tasks[i] == k) {
+                res = min(res, 1 + helper(tasks, K, nmask));
+            } else {
+                res = min(res, 1 + helper(tasks, K - tasks[i], nmask));
+            }
+        }
+    }
+    return dp[mask][k] = res;
+}
+int minSessions(vector<int>& tasks, int sessionTime) {
+    int n = tasks.size(), mask = 1 << n;
+    K = sessionTime;
+    memset(dp, 0, sizeof dp);
+    return helper(tasks, K, mask - 1);
+}
+```
+
+方法二：人选箱
+
+顾名思义，考察当前人可用的箱子，然后递归回溯下一个；优点：逻辑比较清楚
+
+此处需要注意，用ans剪枝；
+
+```c++
+int M, ans;
+int helper(vector<int>& tasks, int id, vector<int>& box, int num) {
+    int n = tasks.size();
+    if (id == n) { return ans = min(ans, num); }
+    int res = n;
+    for (int i = 0; i < n; ++i) {
+        if (0 < i && !box[i - 1]) break;
+        if (tasks[id] + box[i] <= M) {
+            int bf = box[i], bnum = box[i] ? num : num + 1;
+            if (ans < bnum) continue;
+            box[i] += tasks[id];
+            res = min(res, helper(tasks, id + 1, box, bnum));
+            box[i] = bf; 
+        }
+    }   
+    return res;
+}
+int minSessions(vector<int>& tasks, int sessionTime) {
+    int n = tasks.size();
+    M = sessionTime;
+    vector<int> box(n);
+    ans = n;
+    return helper(tasks, 0, box, 0);
+}
+```
+
+方法三：bitmask技术
+
+```c++
+int minSessions(vector<int>& tasks, int sessionTime) {
+    int n = tasks.size(), mask = 1 << n;
+    vector<pair<int,int>> dp(mask, {n, 0});
+    int M = sessionTime;
+    dp[0] = {1, M}; 
+    for (int i = 0; i < mask; ++i) {
+        auto [x, y] = dp[i];
+        for (int j = 0; j < n; ++j) {
+            int tm = 1 << j;
+            if (~i & tm) {
+                int now = i ^ tm, v = tasks[j], xx = x, yy = y;
+                auto [a, b] = dp[now];
+                if (v < yy) yy -= v;
+                else if (v == yy) yy = M, ++xx;
+                else yy = M - v, ++xx;
+                if (xx < a || (xx == a && b < yy)) dp[now] = {xx, yy};
+            }
+        }
+    }
+    auto [a, b] = dp[mask - 1];
+    return b == M ? a - 1 : a;
+}
+```
+
+方法四：mask子集技术
+
+
+
+#### 4. Leetcode 1799: [Maximize Score After N Operations](https://leetcode.cn/problems/maximize-score-after-n-operations/)
+
+题目描述：
+
+```
+You are given nums, an array of positive integers of size 2 * n. You must perform n operations on this array.
+
+In the ith operation (1-indexed), you will:
+
+    Choose two elements, x and y.
+    Receive a score of i * gcd(x, y).
+    Remove x and y from nums.
+
+Return the maximum score you can receive after performing n operations.
+
+The function gcd(x, y) is the greatest common divisor of x and y.
+```
+
+样例1：
+
+```
+Input: nums = [1,2]
+Output: 1
+Explanation: The optimal choice of operations is:
+(1 * gcd(1, 2)) = 1
+```
+
+样例2：
+
+```
+Input: nums = [3,4,6,8]
+Output: 11
+Explanation: The optimal choice of operations is:
+(1 * gcd(3, 6)) + (2 * gcd(4, 8)) = 3 + 8 = 11
+```
+
+样例3
+
+```
+Input: nums = [1,2,3,4,5,6]
+Output: 14
+Explanation: The optimal choice of operations is:
+(1 * gcd(1, 5)) + (2 * gcd(2, 4)) + (3 * gcd(3, 6)) = 1 + 4 + 9 = 14
+```
+
+方法一：箱选人
+
+重点是dp技术，记录mask和结尾箱子的id；
+
+```c++
+map<pair<int,int>,int> dp; 
+int helper(vector<int>& nums, int mask, int lv) {
+    int n = nums.size(), m = n / 2, ans = 0;
+    if (!mask) return 0;
+    if (dp.count({mask, lv})) return dp[{mask,lv}];
+    int ne = __builtin_popcount(mask), id = ne + 1 >> 1;
+    for (int i = 0; i < n; ++i) {
+        int cn = 1 << i;
+        if (mask & cn) {
+            int nmask = mask ^ cn; 
+            int blv = __gcd(lv, nums[i]);
+            int rm = lv ? blv * id + helper(nums, nmask, 0) : helper(nums, nmask, blv);
+            ans = max(ans, rm);
+        }
+    }   
+    return dp[{mask,lv}] = ans;
+}
+int maxScore(vector<int>& nums) {
+    int n = nums.size(), m = n / 2, mask = 1 << n;
+    return helper(nums, mask - 1, 0); 
+}
+
+```
+
+方法二：人选箱，重点是减枝技术和输出注意；
+
+```c++
+int com[14];
+int helper(vector<int>& nums, int id, vector<vector<int>>& buck) {
+    int n = nums.size(), m = n / 2, ans = 0;
+    if (id == n) {
+        for (int i = 0; i < m; ++i) com[i] = __gcd(buck[i][0], buck[i][1]);
+        sort(com, com + m); 
+        for (int i = 0; i < m; ++i) ans += (i + 1) * com[i];
+        return ans;
+    }   
+    for (int i = 0; i < m; ++i) {
+        int sz = buck[i].size();
+        if (sz == 2) continue;
+        buck[i].emplace_back(nums[id]);
+        ans = max(ans, helper(nums, id + 1, buck));
+        buck[i].pop_back();
+        if (sz == 0) break;
+    }   
+    return ans;
+}
+int maxScore(vector<int>& nums) {
+    int n = nums.size(), m = n / 2, mask = 1 << n;
+    vector<vector<int>> bucket(m);
+    return helper(nums, 0, bucket);
+}
+
+```
+
+#### 5. Leetcode 1681: [Minimum Incompatibility](https://leetcode.cn/problems/minimum-incompatibility/)
+
+题目描述：
+
+```
+You are given an integer array nums​​​ and an integer k. You are asked to distribute this array into k subsets of equal size such that there are no two equal elements in the same subset.
+
+A subset's incompatibility is the difference between the maximum and minimum elements in that array.
+
+Return the minimum possible sum of incompatibilities of the k subsets after distributing the array optimally, or return -1 if it is not possible.
+
+A subset is a group integers that appear in the array with no particular order.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,1,4], k = 2
+Output: 4
+Explanation: The optimal distribution of subsets is [1,2] and [1,4].
+The incompatibility is (2-1) + (4-1) = 4.
+Note that [1,1] and [2,4] would result in a smaller sum, but the first subset contains 2 equal elements.
+
+Example 2:
+
+Input: nums = [6,3,8,1,3,1,2,2], k = 4
+Output: 6
+Explanation: The optimal distribution of subsets is [1,2], [2,3], [6,8], and [1,3].
+The incompatibility is (2-1) + (3-2) + (8-6) + (3-1) = 6.
+
+Example 3:
+
+Input: nums = [5,3,3,6,3,3], k = 3
+Output: -1
+Explanation: It is impossible to distribute nums into 3 subsets where no two elements are equal in the same subset.
+
+ 
+
+Constraints:
+
+    1 <= k <= nums.length <= 16
+    nums.length is divisible by k
+    1 <= nums[i] <= nums.length
+```
+
+方法一：人选箱
+
+```c++
+int M, K;
+vector<vector<int>> buck;
+int helper(vector<int>& nums, int id) {
+    int n = nums.size(), ans = 0;
+    if (id == n) {
+        for (int i = 0; i < K; ++i) ans += *(buck[i].rbegin()) - *(buck[i].begin());
+        return ans;
+    }   
+    ans = INT_MAX;
+    for (int i = 0; i < K; ++i) {
+        int sz = buck[i].size();
+        if (sz == M) continue;
+        if (0 < sz && buck[i][sz - 1] == nums[id]) continue;
+        buck[i].emplace_back(nums[id]);
+        ans = min(ans, helper(nums, id + 1));
+        buck[i].pop_back();
+        if (sz == 0) break;
+    }   
+    return ans;
+}
+
+int minimumIncompatibility(vector<int>& nums, int k) {
+    int n = nums.size(); M = n / k, K = k;
+    sort(nums.begin(), nums.end());
+    buck = vector<vector<int>>(K);
+    int ans = helper(nums, 0); 
+    return ans == INT_MAX ? -1 : ans;
+}
+```
+
+方法二：mask子集
+
+mask子集，用递归容易超时，直接用递推+动态规划比较好。
+
+```c++
+int M, K;
+int dp[100000];
+int minimumIncompatibility(vector<int>& nums, int k) {
+    int n = nums.size(), mask = 1 << n; M = n / k, K = k;
+    sort(nums.begin(), nums.end());
+    memset(dp, -1, sizeof dp);
+    for (int i = 0; i < mask; ++i) {
+        int no = __builtin_popcount(i);
+        if (no == M) {
+            int lm = 0, ln = INT_MAX, bf = -1, j = 0;
+            for (; j < n; ++j) if (i & (1 << j)) {
+                if (nums[j] == bf) break;
+                lm = max(lm, nums[j]), ln = min(ln, nums[j]), bf = nums[j];
+            }
+            if (j == n) {
+                dp[i] = lm - ln; 
+            }
+        }
+    }   
+    for (int i = 1; i < mask; ++i) {
+        int no = __builtin_popcount(i);
+        if (no == M) continue;
+        if (no % M == 0) {
+            for (int j = i; j; j = i & (j - 1)) {
+                if (0 <= dp[j] && 0 <= dp[i ^ j]) {
+                    int r = dp[j] + dp[i ^ j]; 
+                    dp[i] = dp[i] < 0 ? r : min(dp[i], r); 
+                }
+            }
+        }
+    }   
+    return dp[mask - 1]; 
+}
+```
+
+
+
+
+
+
+
+```
+1723\857\1986\1799|1681|1655|1815|40
+```
+
+
+
 ### 二、灌水问题、水流问题、矩阵搜索问题
 
 如何确定思路，简化思路；若是DFS/BFS，如何快速写出？
@@ -896,17 +1462,507 @@ emplace()函数：相当于插入的作用，但只能插入一个元素 (C++ 11
 
 各种棋类问题的解答。
 
+```
+LC 913\1728|1690|1686
+```
 
 
-### 二、设计符合要求的数据结构
+
+### 二、扫瞄线算法
+
+扫瞄线算法练习。
+
+```
+1705|1851
+```
+
+
+
+### 三、设计符合要求的数据结构
 
 看到要求O(1)时间完成插入、删除、查找的题目，首先要想到哈系表，一般都是哈系表+某种数据结构（向量/链表）等实现。
 
 
 
-### 三、容器非常有用的接口prev、next
+### 四、容器非常有用的接口prev、next
 
 作用于iterator，返回之前或者之后n个（默认为1）位置的iterator
 
 注意emplace、erase等函数的作用
 
+
+
+## 2022-10-10
+
+### 一、图的最短距离问题
+
+#### 1. dijkstra算法
+
+```c++
+void dijkstra(int id = 0) { // fill dist array, dist for 0 - n is INT_MAX
+    // priority_queue
+    using pri = pair<int,int>;
+    priority_queue<pri,vector<pri>,greater<pri>> q;
+    q.emplace(0, id);
+    dist[id] = 0;
+    vector<int> st(n, 0); // take down status
+    while (!q.empty()) {
+        auto [d, u] = q.top(); t.pop();
+        if (st[u]) continue;
+        for (auto [v, w]: lk[u]) {
+            if (d + w < dist[v]) {
+                dist[v] = d + w;
+                heap.push({d + w, v});
+            }
+        }
+    }
+}
+```
+
+
+
+#### 2. Bellman-Ford 算法
+
+```python
+procedure BellmanFord(list vertices, list edges, vertex source)
+   // 该实现读入边和节点的列表，并向两个数组（distance和predecessor）中写入最短路径信息
+ 
+   // 步骤1：初始化图
+   for each vertex v in vertices:
+       if v is source then distance[v] := 0
+       else distance[v] := infinity
+       predecessor[v] := null
+ 
+   // 步骤2：重复对每一条边进行松弛操作
+   for i from 1 to size(vertices)-1:
+       for each edge (u, v) with weight w in edges:
+           if distance[u] + w < distance[v]:
+               distance[v] := distance[u] + w
+               predecessor[v] := u
+ 
+   // 步骤3：检查负权环
+   for each edge (u, v) with weight w in edges:
+       if distance[u] + w < distance[v]:
+           error "图包含了负权环"
+```
+
+
+
+### 二、Leetcode 1059
+
+有环图的遍历问题：一定要注意，对已经遍历过的点，追加visited标志，否则会重复访问某一个节点导致超时；
+
+
+
+## 2022-10-11
+
+### 一、 Luogu P2894: [USACO08FEB]Hotel G
+
+线段树练习，一上来敲得我有点闷。我本来还挺自信，觉得线段树可以信手拈来，结果一调试，都不知道怎么调试，到底哪出问题了。先把找出来的两个bug记录一下，避免再犯：
+
+#### 1. pushdown()函数没有清除懒惰标记：
+
+```c++
+void pushdown(int rk, int ln, int rn, int l, int m, int r) {
+    int ls = lson(rk), rs = rson(rk);
+    if (lz[rk] == 1) {
+        mx[ls] = lf[ls] = rt[ls] = 0, ind[ls] = l, lz[ls] = 1;
+        mx[rs] = lf[rs] = rt[rs] = 0, ind[rs] = r, lz[rs] = 1;
+    } else {
+        mx[ls] = lf[ls] = rt[ls] = ln, ind[ls] = l, lz[ls] = 2;
+        mx[rs] = lf[rs] = rt[rs] = rn, ind[rs] = m, lz[rs] = 2;
+    }   
+    lz[rk] = 0; // <---------------------------------------------------------------this is the key point
+}
+```
+
+
+
+#### 2. 三段式运算优先级搞错
+
+```c++
+if (a == l && b == r) {
+        if (c == 1) {
+            mx[rk] = lf[rk] = rt[rk] = 0, ind[rk] = l, lz[rk] = 1;
+        } else {
+            mx[rk] = lf[rk] = rt[rk] = r - l, ind[rk] = l, lz[rk] = 2;
+        }
+        return;
+    }
+}
+
+// 上述一开始写成：
+if (a == 1 && b == r) {          // <-------------------------------this expression is wrong
+    c == 1 ? mx[rk] = lf[rk] = rt[rk] = 0, ind[rk] = l, lz[rk] = 1 : mx[rk] = lf[rk] = rt[rk] = r - l, ind[rk] = l, lz[rk] = 2;
+} 
+```
+
+
+
+### 二、模余定理
+
+#### 1. 卢卡斯定理
+
+$$
+C_m^n \equiv C_{m\%p}^{n\%p} * C_{m/p}^{n/p} (mod \ p)
+$$
+
+#### 2. 线性逆元定理
+
+$$
+i^{-1}\equiv -\lfloor \frac{p}{i} \rfloor \times (p \% i)^{-1} (mod \ p)
+$$
+
+
+
+## 2022-10-12
+
+### 一、 Luogu P2894: [USACO08FEB]Hotel G
+
+今天发现的新bug：
+
+1. pushup时，当最大值出现在左孩子处，未考虑到rson(rk)在右孩子处可能扩展的问题。
+2. 题目要求：输出可以出租房屋的最小id，并非是最大连续零区间最左端id，因此需要搜索；
+3. query()中，有忘记加if (lazy[rk]) pushdown() 了，谨记之；
+
+总算是过了，记住教训。
+
+
+
+## 2022-10-13
+
+### 一、Leetcode 天堂硅谷·数字经济算法编程大赛
+
+#### 1. 题目-02. 销售出色区间
+
+```
+给你一份销售数量表 sales，上面记录着某一位销售员每天成功推销的产品数目。
+
+我们认为当销售员同一天推销的产品数目大于 8 个的时候，那么这一天就是「成功销售的一天」。
+
+所谓「销售出色区间」，意味在这段时间内，「成功销售的天数」是严格 大于「未成功销售的天数」。
+
+请你返回「销售出色区间」的最大长度。
+```
+
+
+
+这道题一开始思路错了，以为二分能搞定，结果捣腾半天无果。
+
+其实这里有个转换，记[0,i)区间中出色数为C[i]，则区间[i,j)为出色区间的充要条件是：
+
+$2*C[i]-2*C[j] > i - j$
+
+因此，移位即：
+
+$2*C[i]-i>2*C[j]-j$
+
+至此，最关键的问题就搞定了。
+
+
+
+#### 2. 题目-03. 重复的彩灯树
+
+```
+有一棵结构为二叉树的圣诞树 root 挂满了彩灯，各节点值表示彩灯的颜色。
+
+如果两棵子树具有 相同的结构 和 相同的彩灯颜色分布，则它们是 重复 的。
+
+请返回这棵树上所有 重复的子树。
+
+
+树中的结点数在[1,6000]范围内。
+-200 <= Node.val <= 200
+
+```
+
+这道题咋一看很简单，但实际做起来并非那么回事。
+
+1. 一开始想到，左右孩子都试一遍不久好了？结果不对，答案要求：重复节点只能输出一个！这，难道要一个个对树节点去重？
+2. 想到，后序遍历，并且给节点打上标记，不就不用判断重复节点了？确实，但结果超时了； 
+3. 为避免超时，貌似只能先序遍历，然后一次打出所有子节点。但结果，还是有重复节点的问题。
+4. 回到后续遍历，给节点打上并查集标记，在查找是否相同的函数isSame()中，借用这些标记更快输出，最终通过。
+
+总结一下，就是不断调整思路，加速输出策略，用字典法记录重复的问题。
+
+
+
+#### 3. 题目-04. 补给覆盖
+
+```
+已知有一片呈二叉树的道路，我们要在道路上的一些节点设置补给站支援。
+
+补给站可以设置在任意节点上，每个补给站可以使距离自身小于等于 1 个单位的节点获得补给。
+
+若要使道路的所有节点均能获得补给，请返回所需设置的补给站最少数量。
+```
+
+这题思路不难想，就是动态规划搞定就完事了。我的思路是定义如下状态：
+
+$dp(p,f,c)$表示：对于当前节点p，假设其父节点取值$f\in\{0,1\}$，该结点取值$c\in\{0,1\}$,则不难计算递推公式，写出来有些复杂，省略。
+
+#### 4. 学习别人的思想方法
+
+##### 4.1 题目-02. 销售出色区间
+
+```python
+class Solution:
+    def longestESR(self, sales: List[int]) -> int:
+        pre = dict({0: -1})
+        res = cursum = 0
+
+        for i, h in enumerate(sales):
+            cursum += 1 if h > 8 else -1
+            if cursum > 0:
+                res = i + 1
+            if cursum - 1 in pre:
+                res = max(res, i - pre[cursum - 1])
+            pre.setdefault(cursum, i)
+        return res
+```
+
+看别人的思路真是简洁明了，再反过来看自己的代码，真是惨不忍睹，又臭又长；哎，好打击啊（^-^)。
+
+别人牢牢抓住了：出色区间，>8的数一定大于<8的数，分析[0,i]到[0,j]的变化即可，不像我，就会把问题复杂化。
+
+##### 4.2 题目-03. 重复的彩灯树
+
+```python
+function lightDistribution(root: TreeNode | null): Array<TreeNode | null> {
+   const counter = new Map<string, TreeNode[]>()
+  const res: TreeNode[] = []
+  dfs(root)
+  for (const nodes of counter.values()) {
+    if (nodes.length > 1) res.push(nodes[0])
+  }
+
+  return res
+
+  function dfs(root: TreeNode | null): string {
+    if (!root) return ''
+
+    const left = dfs(root.left)
+    const right = dfs(root.right)
+    const key = `${root.val}#${left}#${right}`
+    !counter.has(key) && counter.set(key, [])
+    counter.get(key)!.push(root)
+    return key
+  }
+};
+```
+
+别人的思路与我大体相似，也是后续遍历加字典加速，但用了一个字符串去重的巧妙思路，学到了！我当时也想来个数组去重来着，可惜没实践。
+
+##### 4.3 题目-04. 补给覆盖
+
+```python
+function minSupplyStationNumber(root: TreeNode | null): number {
+let res = 0
+  const dfs = (root) => {
+
+    if (!root) return 1
+    const left = dfs(root.left)
+    const right = dfs(root.right)
+
+
+    if (left === 0 || right === 0) {
+      res++
+      return 2
+    }
+
+
+    if (left === 2 || right === 2) {
+      return 1
+    }
+
+
+    return 0
+  }
+
+```
+
+看看别人这代码，多简洁，而我的确长篇大论。不敢相信，两个代码居然做的是一件事情。
+
+我是从上往下分析的，考虑当前节点如何由子节点表示。而题中思路则相反，考虑如何直接由子节点状态得到父节点。
+
+学会正反两方向思考，打开思维逻辑！
+
+
+
+## 2022-10-21
+
+### 一、Minimum Adjacent Swaps for K Consecutive Ones
+
+Leetcode Biweekly-Contest-42
+
+```
+
+```
+
+### 二、Minimum Move To make Array complementary
+
+1674
+
+
+
+## 2022-10-22
+
+### 一、Leetcode 周赛316
+
+#### 1. 使数组相等的最小开销（第三题，总6216）
+
+问题描述：
+
+```
+给你两个下标从 0 开始的数组 nums 和 cost ，分别包含 n 个 正 整数。
+
+你可以执行下面操作 任意 次：
+
+    将 nums 中 任意 元素增加或者减小 1 。
+
+对第 i 个元素执行一次操作的开销是 cost[i] 。
+
+请你返回使 nums 中所有元素 相等 的 最少 总开销。
+```
+
+样例1：
+
+```
+输入：nums = [1,3,5,2], cost = [2,3,1,14]
+输出：8
+解释：我们可以执行以下操作使所有元素变为 2 ：
+- 增加第 0 个元素 1 次，开销为 2 。
+- 减小第 1 个元素 1 次，开销为 3 。
+- 减小第 2 个元素 3 次，开销为 1 + 1 + 1 = 3 。
+总开销为 2 + 3 + 3 = 8 。
+这是最小开销。
+```
+
+样例2：
+
+```
+输入：nums = [2,2,2,2,2], cost = [4,2,8,1,3]
+输出：0
+解释：数组中所有元素已经全部相等，不需要执行额外的操作。
+```
+
+思路：
+
+不难想到思路，考虑取值为每一个节点即可，一次变化取最小值。
+
+这道题主要在debug过程，调了近一个小时！！！记录下debug过程
+
+1) 递推关系写错，和应该减上一个秩对应的两倍；
+
+2) 忘记排序，递推的贪心算法，当且尽当数组有序的情况下才生效；
+
+3) 由于用iota记录秩数组进行排序，所以当前秩为rk[i]，上一个秩为rk[i-1]，而非i - 1;
+
+4) 初始化0忘记转换成rk[0]了；
+
+总之，还是形成最终代码太慢，要加快coding速度！！！
+
+最终形成代码：
+
+```c++
+long long minCost(vector<int>& nums, vector<int>& cost) {
+    int n = nums.size();
+    vector<int> rk(n);
+    iota(rk.begin(), rk.end(), 0); 
+    sort(rk.begin(), rk.end(), [&](int a, int& b){ 
+        return nums[a] < nums[b];
+    }); 
+    long long sb = accumulate(cost.begin(), cost.end(), 0LL); 
+    long long sa = 0;
+    for (int i = 0; i < n; ++i) sa += (long long)nums[i] * cost[i];
+    long long ans = sa - (long long)nums[rk[0]] * sb; 
+    for (int i = 1; i < n; ++i) {
+        int t = rk[i], b = rk[i - 1]; 
+        sa -= 2 * (long long)nums[b] * cost[b];
+        sb -= 2 * cost[b];
+        ans = min(ans, sa - (long long)nums[t] * sb);
+    }   
+    return ans;
+}
+```
+
+#### 2. 使数组相似的最少操作次数（第四题，总6217）
+
+题目描述：
+
+```
+给你两个正整数数组 nums 和 target ，两个数组长度相等。
+
+在一次操作中，你可以选择两个 不同 的下标 i 和 j ，其中 0 <= i, j < nums.length ，并且：
+
+    令 nums[i] = nums[i] + 2 且
+    令 nums[j] = nums[j] - 2 。
+
+如果两个数组中每个元素出现的频率相等，我们称两个数组是 相似 的。
+
+请你返回将 nums 变得与 target 相似的最少操作次数。测试数据保证 nums 一定能变得与 target 相似。
+```
+
+样例1：
+
+```
+输入：nums = [8,12,6], target = [2,14,10]
+输出：2
+解释：可以用两步操作将 nums 变得与 target 相似：
+- 选择 i = 0 和 j = 2 ，nums = [10,12,4] 。
+- 选择 i = 1 和 j = 2 ，nums = [10,14,2] 。
+2 次操作是最少需要的操作次数。
+```
+
+样例2：
+
+```
+输入：nums = [1,2,5], target = [4,1,3]
+输出：1
+解释：一步操作可以使 nums 变得与 target 相似：
+- 选择 i = 1 和 j = 2 ，nums = [1,4,3] 。
+```
+
+样例3：
+
+```
+输入：nums = [1,1,1,1,1], target = [1,1,1,1,1]
+输出：0
+解释：数组 nums 已经与 target 相似。
+```
+
+思路：
+
+这题咋一看很难，一开始想时没有思路，因为我以为题目中的操作必须要i < j；后来注意到无序后，才知道要排序搞定；
+
+然后注意到样例2，排序后貌似也很困惑，之后不难想到，由于是加2，所以奇偶性不变，所以，数组分成奇数和偶数两半，再统计差值，搞定。
+
+代码：
+
+```c++
+pair<int,int> stn(vector<int>& nums) {
+    int n = nums.size(), i = 0, j = 0;
+    while (j < n) {
+        while (i < n && (nums[i] & 1)) ++i;
+        j = max(j, i + 1); 
+        while (j < n && !(nums[j] & 1)) ++j;  // debug 1
+        if (j < n) swap(nums[i++], nums[j++]);
+    }   
+    i = 0;
+    for (; i < n && (nums[i] & 1); ++i);
+    sort(nums.begin(), nums.begin() + i); 
+    sort(nums.begin() + i, nums.end());
+    return { i, n - i };
+}
+long long makeSimilar(vector<int>& nums, vector<int>& target) {
+    int n = nums.size();
+    auto [a, b] = stn(nums); auto [c, d] = stn(target);
+    long long ans = 0;
+    for (int i = 0; i < n; ++i) ans += (nums[i] < target[i]) ? target[i] - nums[i] : 0;
+    return ans / 2;
+}
+```
+
+Debug：
+
+1. 一开始debug 1那行仅写了if ()判断奇数才加J，导致死循环；
