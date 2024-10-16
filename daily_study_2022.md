@@ -43,10 +43,11 @@ void update(int x, int v) {
 int search(int x) {
    	int res = 0; 
     for (; 0 < x; x -= x & -x) res += bit[x];
+    return ans;
 }
 ```
 
-区间更新、区间查询：
+区间修改、区间查询：
 
 ```c++
 void update(int x, int v) {
@@ -59,12 +60,13 @@ void update(int x, int v) {
 void search(int x) {
     int res = 0, y = x;
     for (; 0 < x; x -= x & -x) res += y * s1[x] - s2[x];
+    return ans;
 }
 ```
 
 #### 4. 扫描线算法
 
-代完善；
+待完善；
 
 #### 5. 各容器接口
 
@@ -139,7 +141,7 @@ int gcd(int a, int b) {
 除法模余（逆模余）
 
 ```c++
-a / b % M = a * (b ^ M - 2) % M (M与b互素）
+a / b % M = a * (b ^ (M - 2)) % M (M与b互素）
 ```
 
 
@@ -176,6 +178,72 @@ void find(string s) {
 
 Leetcode中的一题；
 
+##### 9.1 Leetcode 1703: [Minimum Adjacent Swaps for K Consecutive Ones](https://leetcode.cn/problems/minimum-adjacent-swaps-for-k-consecutive-ones/)
+
+题目描述：
+
+```
+You are given an integer array, nums, and an integer k. nums comprises of only 0's and 1's. In one move, you can choose two adjacent indices and swap their values.
+
+Return the minimum number of moves required so that nums has k consecutive 1's.
+
+Example 1:
+
+Input: nums = [1,0,0,1,0,1], k = 2
+Output: 1
+Explanation: In 1 move, nums could be [1,0,0,0,1,1] and have 2 consecutive 1's.
+
+Example 2:
+
+Input: nums = [1,0,0,0,0,0,1,1], k = 3
+Output: 5
+Explanation: In 5 moves, the leftmost 1 can be shifted right until nums = [0,0,0,0,0,1,1,1].
+
+Example 3:
+
+Input: nums = [1,1,0,1], k = 2
+Output: 0
+Explanation: nums already has 2 consecutive 1's.
+
+Constraints:
+
+    1 <= nums.length <= 105
+    nums[i] is 0 or 1.
+    1 <= k <= sum(nums)
+```
+
+方法：取中位数，时间复杂度为O(n)，证明可以用数学归纳法：
+
+```c++
+#define L 100010
+int minMoves(vector<int>& nums, int k) {
+    if (k == 1) return 0;
+    int n = nums.size(), m = 0;
+    long long pa[L];
+    for (int i = 0; i < n; ++i) if (nums[i]) pa[m++] = i;
+    int med = k + 1 >> 1;
+    int cm = med;
+    long long vl = 0, vr = 0, wl, wr; 
+    for (int i = 0; i < med; ++i) vl += i;
+    for (int i = 0; i <= k - med; ++i) vr += i;
+    wl = vl + med, wr = vr - (k - med);
+    long long sl = accumulate(pa, pa + med, 0); 
+    long long sr = accumulate(pa + med, pa + k, 0); 
+    long long cl = (med * pa[cm - 1] - sl - vl) + (sr - (k - med) * pa[cm - 1] - vr);
+    long long cr = (med * pa[cm] - sl - wl) + (sr - (k - med) * pa[cm] - wr);
+    long long ans = (k & 1) ? cl : min(cl, cr);
+    for (int i = 1; i + k <= m; ++i) {
+        cm = i + med;
+        sl += pa[cm - 1] - pa[i - 1]; 
+        sr += pa[i + k - 1] - pa[cm - 1]; 
+        cl = (med * pa[cm - 1] - sl - vl) + (sr - (k - med) * pa[cm - 1] - vr);
+        cr = (med * pa[cm] - sl - wl) + (sr - (k - med) * pa[cm] - wr);
+        ans = (k & 1) ? min(ans, cl) : min(ans, min(cl, cr));
+    }
+    return ans;
+}
+```
+
 
 
 #### 10. 内置库函数
@@ -192,9 +260,78 @@ __builtin_clz/ctz/ffs // 二进制位中开头|结尾0的个数|第一个1出现
 for (x = mask; x; x = mask & x - 1)
 ```
 
-#### 12. 重叠区间最小|大和技巧
+#### 12. 覆盖点的区间个数查询
 
-动态重置区间； 
+[add in 2022-10-27]
+
+利用差分的技巧，在区间端点处修改差值，用左区间和表示当前代查询值。
+
+##### 12.1 Leetcode 1674 [Minimum Moves to Make Array Complementary](https://leetcode.cn/problems/minimum-moves-to-make-array-complementary/)
+
+题目描述：
+
+```
+You are given an integer array nums of even length n and an integer limit. In one move, you can replace any integer from nums with another integer between 1 and limit, inclusive.
+
+The array nums is complementary if for all indices i (0-indexed), nums[i] + nums[n - 1 - i] equals the same number. For example, the array [1,2,3,4] is complementary because for all indices i, nums[i] + nums[n - 1 - i] = 5.
+
+Return the minimum number of moves required to make nums complementary.
+
+Example 1:
+
+Input: nums = [1,2,4,3], limit = 4
+Output: 1
+Explanation: In 1 move, you can change nums to [1,2,2,3] (underlined elements are changed).
+nums[0] + nums[3] = 1 + 3 = 4.
+nums[1] + nums[2] = 2 + 2 = 4.
+nums[2] + nums[1] = 2 + 2 = 4.
+nums[3] + nums[0] = 3 + 1 = 4.
+Therefore, nums[i] + nums[n-1-i] = 4 for every i, so nums is complementary.
+
+Example 2:
+
+Input: nums = [1,2,2,1], limit = 2
+Output: 2
+Explanation: In 2 moves, you can change nums to [2,2,2,2]. You cannot change any number to 3 since 3 > limit.
+
+Example 3:
+
+Input: nums = [1,2,1,2], limit = 2
+Output: 0
+Explanation: nums is already complementary.
+
+Constraints:
+
+    n == nums.length
+    2 <= n <= 105
+    1 <= nums[i] <= limit <= 105
+    n is even.
+```
+
+计算“覆盖点的区间个数”：
+
+```c++
+#define L 200010
+int minMoves(vector<int>& nums, int limit) {
+    vector<int> ct(L);
+    int n = nums.size();
+    for (int i = 0; i < n / 2; ++i) {
+        int j = n - i - 1;
+        int a = min(1 + nums[i], 1 + nums[j]);
+        int b = nums[i] + nums[j];
+        int c = max(limit + nums[i], limit + nums[j]);
+        ct[2] += 2, ct[a] -= 1, ct[b] -= 1, ct[b + 1] += 1, ct[c + 1] += 1;
+    }   
+    int ans = INT_MAX, s = 0;
+    for (int i = 2; i <= 2 * limit; ++i) {
+        s += ct[i];
+        ans = min(ans, s); 
+    }   
+    return ans;
+}
+```
+
+
 
 #### 13. string->int方法
 
@@ -565,7 +702,7 @@ vector<int> build_kmp(string s) {
     vector<int> p[n]; 
     int j = 0, t = p[0] = -1;
     while (j < n - 1) {
-        if (j < 0 || s[j] == s[t]) {
+        if (t < 0 || s[j] == s[t]) {
             ++j, ++t;
             p[j] = p[j] == p[t] ? p[t] : t;
         } else t = p[t];
@@ -634,17 +771,17 @@ class Solution {
 public:
     Solution(ListNode* n): head(n) {}
     int getRandom() {
-    int ans = head->val;
-    ListNode* node = head->next;
-    int i = 2;
-    while (node) {
-        if ((rand() % i) == 0) {
-        	ans = node->val;
+        int ans = head->val;
+        ListNode* node = head->next;
+        int i = 2;
+        while (node) {
+            if ((rand() % i) == 0) {
+                ans = node->val;
+            }
+            ++i;
+            node = node->next;
         }
-        ++i;
-        node = node->next;
-    }
-    return ans;
+        return ans;
     }
 };
 ```
@@ -872,6 +1009,18 @@ dp[i] = {dp[p1]*a1, dp[p2]*a2,dp[p3]*a3, ... , dp[pn]*an};
 ### 一、 排列组合（选箱子选人）问题
 
 类似问题容易混淆，容易搞不清楚代码逻辑，宜多做总结。
+
+（add in 2022-10-24)
+
+```
+总结：
+1. 一般而言，这类问题的解决方法，我称之为以下四类：1)人选箱（递归回溯）；2）箱选人（递归回溯）；3）bitmask技术（结合二分或DP）；4）mask子集技术（DP，递推）；
+2. 就运行速度，一般而言：mask子集+DP>bitmask+DP>人选箱>箱选人；这也是建议的解决问题的方法优先顺序。注意：人选箱的剪枝条件越好，运行速度越快，需要多加思考；
+3. 一般而言，“箱选人”较“人选箱”的优势在于，箱选人可以更容易结合DP记忆化输出。
+4. 当箱选人，箱子（无区别）大小相同，即不放回时，箱选人使用：第n个箱子，服务id为【st, n）范围内的人，速度也很快，且方便DP；
+```
+
+
 
 （add in 2022-10-22）
 
@@ -1425,9 +1574,286 @@ int minimumIncompatibility(vector<int>& nums, int k) {
 }
 ```
 
+#### 6. Leetcode 1655: [Distribute Repeating Integers](https://leetcode.cn/problems/distribute-repeating-integers/)
+
+题目描述：
+
+```
+You are given an array of n integers, nums, where there are at most 50 unique values in the array. You are also given an array of m customer order quantities, quantity, where quantity[i] is the amount of integers the ith customer ordered. Determine if it is possible to distribute nums such that:
+
+    The ith customer gets exactly quantity[i] integers,
+    The integers the ith customer gets are all equal, and
+    Every customer is satisfied.
+
+Return true if it is possible to distribute nums according to the above conditions.
+
+Example 1:
+
+Input: nums = [1,2,3,4], quantity = [2]
+Output: false
+Explanation: The 0th customer cannot be given two different integers.
+
+Example 2:
+
+Input: nums = [1,2,3,3], quantity = [2]
+Output: true
+Explanation: The 0th customer is given [3,3]. The integers [1,2] are not used.
+
+Example 3:
+
+Input: nums = [1,1,2,2], quantity = [2,2]
+Output: true
+Explanation: The 0th customer is given [1,1], and the 1st customer is given [2,2].
+
+Constraints:
+
+    n == nums.length
+    1 <= n <= 105
+    1 <= nums[i] <= 1000
+    m == quantity.length
+    1 <= m <= 10
+    1 <= quantity[i] <= 105
+    There are at most 50 unique values in nums.
+```
+
+方法一：人选箱
+
+```c++
+int M, N;
+unordered_map<int,int> bum;
+int buck[50];
+bool helper(vector<int>& qu, int id) {
+    if (id == M) return true;
+    for (int i = 0; i < N; ++i) {
+        if (buck[i] < qu[id]) continue;
+        buck[i] -= qu[id];
+        bool r = helper(qu, id + 1); 
+        if (r) return true;
+        buck[i] += qu[id];
+    }   
+    return false;
+}
+bool canDistribute(vector<int>& nums, vector<int>& quantity) {
+    M = quantity.size();
+    for (auto& v: nums) bum[v]++;
+    N = 0;
+    for (auto& [k, v]: bum) buck[N++] = v;
+    auto f = [&](int& a, int& b) {
+        return b < a;
+    };  
+    sort(buck, buck + N, f); 
+    sort(quantity.begin(), quantity.end(), f); 
+    return helper(quantity, 0); 
+}
+```
 
 
 
+未通过方法（箱选人，超时）：
+
+```c++
+int N, M;
+unordered_map<int,int> bum;
+int buck[50];
+map<vector<int>,int> dm; 
+bool helper(vector<int>& quan, int id, int mask) {
+    if (mask == (1 << M) - 1) return true;
+    if (id == N) return false;
+    if (dm.count({mask,id,buck[id]})) return dm[{mask,id,buck[id]}];
+    for (int i = 0; i < M; ++i) {
+        if (mask & (1 << i)) continue;
+        if (buck[id] < quan[i]) {
+            bool r = helper(quan, id + 1, mask);
+            if (r) return dm[{mask,id,buck[id]}] = true;
+            continue;
+        }
+        mask ^= (1 << i); 
+        buck[id] -= quan[i];
+        bool r = helper(quan, id, mask);
+        if (r) return dm[{mask,id,buck[id]}]= true;
+        buck[id] += quan[i];
+        mask ^= (1 << i); 
+    }   
+    return dm[{mask,id,buck[id]}]= false;
+}
+bool canDistribute(vector<int>& nums, vector<int>& quantity) {
+    M = quantity.size();
+    for (auto v: nums) ++bum[v];
+    N = 0;
+    for (auto [k, v]: bum) buck[N++] = v;
+    sort(quantity.begin(), quantity.end(), [&](int& a, int& b){ 
+        return b < a;
+    }); 
+    return helper(quantity, 0, 0); 
+}
+```
+
+
+
+#### 7. Leetcode 1815: [Maximum Number of Groups Getting Fresh Donuts](https://leetcode.cn/problems/maximum-number-of-groups-getting-fresh-donuts/)
+
+问题描述：
+
+```
+There is a donuts shop that bakes donuts in batches of batchSize. They have a rule where they must serve all of the donuts of a batch before serving any donuts of the next batch. You are given an integer batchSize and an integer array groups, where groups[i] denotes that there is a group of groups[i] customers that will visit the shop. Each customer will get exactly one donut.
+
+When a group visits the shop, all customers of the group must be served before serving any of the following groups. A group will be happy if they all get fresh donuts. That is, the first customer of the group does not receive a donut that was left over from the previous group.
+
+You can freely rearrange the ordering of the groups. Return the maximum possible number of happy groups after rearranging the groups.
+
+Example 1:
+
+Input: batchSize = 3, groups = [1,2,3,4,5,6]
+Output: 4
+Explanation: You can arrange the groups as [6,2,4,5,1,3]. Then the 1st, 2nd, 4th, and 6th groups will be happy.
+
+Example 2:
+
+Input: batchSize = 4, groups = [1,3,2,5,2,2,1,6]
+Output: 4
+
+Constraints:
+
+    1 <= batchSize <= 9
+    1 <= groups.length <= 30
+    1 <= groups[i] <= 109
+```
+
+方法一：箱选人+DP
+
+这里的DP直接图方便，使用map做秩；实际上可以用最多8进制表示key；这道题如果用“人选箱”则不太好做，数量太大且剪枝不太方便，暂时没想到用“人选箱”的方法。
+
+```c++
+int M, BT, SUM;
+map<int,int> bm; 
+map<pair<map<int,int>,int>,int> dp; 
+int helper(int lv) {
+    if (SUM == 0) return 0;
+    if (dp.count({bm, lv})) return dp[{bm,lv}];
+    int ans = 0;
+    for (auto& [k, v]: bm) {
+        if (!v) continue;
+        --SUM; --bm[k];
+        int nlv = (k + lv) % BT; 
+        ans = max(ans, helper(nlv));
+        ++SUM; ++bm[k];
+    }   
+    if (!lv) ans += 1;
+    return dp[{bm,lv}] = ans;
+}
+int maxHappyGroups(int bt, vector<int>& groups) {
+    int n = groups.size();
+    for (auto& v: groups) ++bm[v % bt];
+    int ans = bm[0];
+    bm[0] = 0;
+    for (int i = 1; i < bt - i; ++i) {
+        int r = min(bm[i], bm[bt - i]);
+        bm[i] -= r, bm[bt - i] -= r;
+        ans += r;
+    }   
+    if (~bt & 1) { ans += bm[bt >> 1] >> 1; bm[bt >> 1] %= 2; }
+    M = bm.size(), BT = bt; 
+    for (auto& [k, v]: bm) SUM += v;
+    return ans + helper(0);
+}
+```
+
+#### 8. Leetcode 40: [Combination Sum II](https://leetcode.cn/problems/combination-sum-ii/)
+
+题目描述：
+
+```
+Given a collection of candidate numbers (candidates) and a target number (target), find all unique combinations in candidates where the candidate numbers sum to target.
+
+Each number in candidates may only be used once in the combination.
+
+Note: The solution set must not contain duplicate combinations.
+
+Example 1:
+
+Input: candidates = [10,1,2,7,6,1,5], target = 8
+Output: 
+[
+[1,1,6],
+[1,2,5],
+[1,7],
+[2,6]
+]
+
+Example 2:
+
+Input: candidates = [2,5,2,1,2], target = 5
+Output: 
+[
+[1,2,2],
+[5]
+]
+
+Constraints:
+
+    1 <= candidates.length <= 100
+    1 <= candidates[i] <= 50
+    1 <= target <= 30
+```
+
+方法一：人选箱：
+
+组合问题与“人选箱、箱选人”类似，需要注意的是：箱子只有一个、有无重复元素、放回还是不放回；
+
+```c++
+set<vector<int>> sv; 
+vector<int> path;
+map<int,int> um; 
+void helper(map<int,int>::iterator it, int lv) {
+    if (lv == T) { sv.insert(path); return; }
+    if (it == um.end()) return;
+    auto k = it->first, v = it->second;
+    int i = 0;
+    for (; i <= v; ++i) {
+        if (T < lv + i * k) break;
+        helper(next(it), lv + i * k); 
+        path.emplace_back(k);
+    }   
+    while (i--) path.pop_back();
+}
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+    for (auto& v: candidates) um[v]++;
+    T = target;
+    helper(um.begin(), 0); 
+    vector<vector<int>> ans;
+    for (auto& v: sv) ans.emplace_back(v);
+    return ans;
+}
+```
+
+方法二：箱选人：只有一个箱子时，箱选人和人选箱时一样的。下面是将候选数组展开的写法：
+
+```c++
+vector<vector<int>> res;
+vector<int> ans;
+
+void gen(vector<int>& nums, int tg, int st) {
+    if (tg == 0) {
+        res.push_back(ans);
+        return;
+    }   
+    for (int i = st; i < nums.size() && nums[i] <= tg; ++i) {
+        if (i == st || nums[i] != nums[i - 1]) {
+            ans.push_back(nums[i]);
+            tg -= nums[i]; // 不把tg - nums[i]写到回溯函数里，这样更快
+            gen(nums, tg, i + 1); 
+            tg += nums[i];
+            ans.pop_back();
+        }
+    }   
+}
+
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+    sort(candidates.begin(), candidates.end());
+    gen(candidates, target, 0); 
+    return res;
+}
+```
 
 
 
@@ -1458,9 +1884,227 @@ emplace()函数：相当于插入的作用，但只能插入一个元素 (C++ 11
 
 ## 2022-10-08
 
-### 一、 极大极小问题（一些博弈游戏的策略问题）
+### 一、 （博弈）极大极小问题（一些博弈游戏的策略问题）
 
-各种棋类问题的解答。
+各种棋类、决策类问题的解答。
+
+[add in 2022-10-24]
+
+这类问题，简单来说，就是分步决策，每一步可以有不同的优化目标（当然，有时候看起来不同的优化目标可以合并）。
+
+大部分问题可以用：状态转移类DP解决，否则用分步递归+记忆化。
+
+#### 1. Leetcode 1690[Stone Game VII](https://leetcode.cn/problems/stone-game-vii/)
+
+题目描述：
+
+```
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones arranged in a row. On each player's turn, they can remove either the leftmost stone or the rightmost stone from the row and receive points equal to the sum of the remaining stones' values in the row. The winner is the one with the higher score when there are no stones left to remove.
+
+Bob found that he will always lose this game (poor Bob, he always loses), so he decided to minimize the score's difference. Alice's goal is to maximize the difference in the score.
+
+Given an array of integers stones where stones[i] represents the value of the ith stone from the left, return the difference in Alice and Bob's score if they both play optimally.
+
+Example 1:
+
+Input: stones = [5,3,1,4,2]
+Output: 6
+Explanation: 
+- Alice removes 2 and gets 5 + 3 + 1 + 4 = 13 points. Alice = 13, Bob = 0, stones = [5,3,1,4].
+- Bob removes 5 and gets 3 + 1 + 4 = 8 points. Alice = 13, Bob = 8, stones = [3,1,4].
+- Alice removes 3 and gets 1 + 4 = 5 points. Alice = 18, Bob = 8, stones = [1,4].
+- Bob removes 1 and gets 4 points. Alice = 18, Bob = 12, stones = [4].
+- Alice removes 4 and gets 0 points. Alice = 18, Bob = 12, stones = [].
+The score difference is 18 - 12 = 6.
+
+Example 2:
+
+Input: stones = [7,90,5,1,100,10,10,2]
+Output: 122
+
+Constraints:
+
+    n == stones.length
+    2 <= n <= 1000
+    1 <= stones[i] <= 1000
+```
+
+方法：分步DP（当然，状态转移可以合并，这里特别分开写时为了一般化）
+
+```c++
+#define L 1010
+int da[L][L], db[L][L], sa[L];
+int stoneGameVII(vector<int>& stones) {
+    int n = stones.size();
+    partial_sum(stones.begin(), stones.end(), sa + 1); 
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 0; j <= n - i; ++j) {
+            if ((n - i) & 1) {
+                db[i][j] = min(da[i - 1][j] - sa[i + j - 1] + sa[j], da[i - 1][j + 1] - sa[i + j] + sa[j + 1]); // 状态b的转移方程
+            }
+            else {
+                da[i][j] = max(db[i - 1][j] + sa[i + j - 1] - sa[j], db[i - 1][j + 1] + sa[i + j] - sa[j + 1]); // 状态a的转移方程
+            }
+        }
+    }   
+    return da[n][0];
+}
+```
+
+
+
+#### 2. Leetcode 1686: [Stone Game VI](https://leetcode.cn/problems/stone-game-vi/)
+
+题目描述：
+
+```
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones in a pile. On each player's turn, they can remove a stone from the pile and receive points based on the stone's value. Alice and Bob may value the stones differently.
+
+You are given two integer arrays of length n, aliceValues and bobValues. Each aliceValues[i] and bobValues[i] represents how Alice and Bob, respectively, value the ith stone.
+
+The winner is the person with the most points after all the stones are chosen. If both players have the same amount of points, the game results in a draw. Both players will play optimally. Both players know the other's values.
+
+Determine the result of the game, and:
+
+    If Alice wins, return 1.
+    If Bob wins, return -1.
+    If the game results in a draw, return 0.
+
+Example 1:
+
+Input: aliceValues = [1,3], bobValues = [2,1]
+Output: 1
+Explanation:
+If Alice takes stone 1 (0-indexed) first, Alice will receive 3 points.
+Bob can only choose stone 0, and will only receive 2 points.
+Alice wins.
+
+Example 2:
+
+Input: aliceValues = [1,2], bobValues = [3,1]
+Output: 0
+Explanation:
+If Alice takes stone 0, and Bob takes stone 1, they will both have 1 point.
+Draw.
+
+Example 3:
+
+Input: aliceValues = [2,4,3], bobValues = [1,6,7]
+Output: -1
+Explanation:
+Regardless of how Alice plays, Bob will be able to have more points than Alice.
+For example, if Alice takes stone 1, Bob can take stone 2, and Alice takes stone 0, Alice will have 6 points to Bob's 7.
+Bob wins.
+Constraints:
+
+    n == aliceValues.length == bobValues.length
+    1 <= n <= 105
+    1 <= aliceValues[i], bobValues[i] <= 100
+```
+
+双层DP：
+
+```c++
+    int stoneGameVI(vector<int>& aliceValues, vector<int>& bobValues) {
+        int n = aliceValues.size();
+        vector<int> dp(n);
+        iota(dp.begin(), dp.end(), 0);
+        sort(dp.begin(), dp.end(), [&](int& a, int& b) {
+            return aliceValues[a] + bobValues[a] > aliceValues[b] + bobValues[b];
+        });
+        int ans = 0;
+        for (int i = 0; i < n; ++i) ans += (i & 1) ? -bobValues[dp[i]] : aliceValues[dp[i]];
+        return 0 < ans ? 1 : (ans ? -1 : 0);
+    }
+```
+
+[add in 2022-11-15]
+
+### 3. Leetcode 913: [Cat and Mouse](https://leetcode.cn/problems/cat-and-mouse/)
+
+这道题用DP做会超时，本题的主要难点在于0值点的判定；这道题初做的时候想了蛮久，其原因就是，不知道什么状态下可以确定返回0；看了解析后知道，可以根据总步数确定0值点，跟据抽屉原理，步数超过一定值后，按照最优原理，仍然不能确定状态的必然时和局。
+
+但这道题更巧妙的做法是正向DP，根据递归的原则递推，会发现实际上是一个关键路径的算法，非常巧妙。不再赘述，用代码说明问题
+
+```c++
+#define L 110
+vector<vector<int>> gr;
+int dp[L][L][2], dg[L][L][2];
+queue<vector<int>> sp;
+int catMouseGame(vector<vector<int>>& graph) {
+    int n = graph.size();
+    // init
+    for (int i = 1; i < n; ++i) {
+        dp[0][i][0] = dp[0][i][1] = 1;
+        vector<int> a({0,i,0}), b({0,i,1});
+        sp.push(a);
+        sp.push(b);
+    }
+    for (int i = 1; i < n; ++i) {
+        dp[i][i][0] = dp[i][i][1] = 2;
+        vector<int> a({i,i,0}), b({i,i,1});
+        sp.push(a);
+        sp.push(b);
+    }   
+    for (int i = 0; i < n; ++i) {
+        for (int j = 1; j < n; ++j) {
+            dg[i][j][0] = graph[i].size();
+            dg[i][j][1] = graph[j].size();
+            for (auto& v: graph[j]) if (!v) --dg[i][j][1];
+        }
+    }   
+    // key path algorithm
+    while (!sp.empty()) {
+        auto v = sp.front(); sp.pop();
+        auto m = v[0], c = v[1], w = v[2];
+        //PRV(v);
+        int t = dp[m][c][w];
+        //PR(t);
+        if (w & 1) { // current is cat, then last is mouse
+             for (auto& v: graph[m]) {
+                if (dp[v][c][0]) continue;
+                if (t == 1) {
+                    dp[v][c][0] = 1;
+                    sp.push({v,c,0});
+                } else {
+                    dg[v][c][0]--;
+                    if (dg[v][c][0] == 0) {
+                        dp[v][c][0] = 2;
+                        sp.push({v,c,0});
+                    }
+                }
+            }
+        } else {
+            for (auto& v: graph[c]) {
+                if (!v) continue;
+                if (dp[m][v][1]) continue;
+                if (t == 2) {
+                    dp[m][v][1] = 2;
+                    sp.push({m,v,1});
+                } else {
+                    dg[m][v][1]--;
+                    if (dg[m][v][1] == 0) {
+                        dp[m][v][1] = 1;
+                        sp.push({m,v,1});
+                    }
+                }
+            }
+        }
+    }
+    // final answer
+    return dp[1][2][0];
+}
+```
+
+### 4. Leetcode 1728: [Cat and Mouse II](https://leetcode.cn/problems/cat-and-mouse-ii/)
+
+说是上一题的进阶，但个人感觉这道题更容易做，因为可以用递归+记忆化得到答案。不过写出来确实繁琐，实际上这道题可以沿用关键路径的思想。
+
+需要注意的是审题，题目中强调，只能沿一个方向走n步，而不是任意走n步，这里调试了许久。
 
 ```
 LC 913\1728|1690|1686
@@ -1468,12 +2112,190 @@ LC 913\1728|1690|1686
 
 
 
-### 二、扫瞄线算法
+### 二、扫描线算法
 
-扫瞄线算法练习。
+(add in 2022-10-27) 
+
+扫瞄线算法总结：
 
 ```
-1705|1851
+Foreach(ai):
+	percept < ai in queue;
+	remove all < ai in queue;
+	update new == ai to queue;
+```
+
+需要注意的就是，每个新节点可以时起点，也可是终点，需要在每一个端点都判断一次；
+
+#### 1. Leetcode 1705: [Maximum Number of Eaten Apples](https://leetcode.cn/problems/maximum-number-of-eaten-apples/)
+
+题目描述：
+
+```
+There is a special kind of apple tree that grows apples every day for n days. On the ith day, the tree grows apples[i] apples that will rot after days[i] days, that is on day i + days[i] the apples will be rotten and cannot be eaten. On some days, the apple tree does not grow any apples, which are denoted by apples[i] == 0 and days[i] == 0.
+
+You decided to eat at most one apple a day (to keep the doctors away). Note that you can keep eating after the first n days.
+
+Given two integer arrays days and apples of length n, return the maximum number of apples you can eat.
+
+Example 1:
+
+Input: apples = [1,2,3,5,2], days = [3,2,1,4,2]
+Output: 7
+Explanation: You can eat 7 apples:
+- On the first day, you eat an apple that grew on the first day.
+- On the second day, you eat an apple that grew on the second day.
+- On the third day, you eat an apple that grew on the second day. After this day, the apples that grew on the third day rot.
+- On the fourth to the seventh days, you eat apples that grew on the fourth day.
+
+Example 2:
+
+Input: apples = [3,0,0,0,0,2], days = [3,0,0,0,0,2]
+Output: 5
+Explanation: You can eat 5 apples:
+- On the first to the third day you eat apples that grew on the first day.
+- Do nothing on the fouth and fifth days.
+- On the sixth and seventh days you eat apples that grew on the sixth day.
+
+Constraints:
+
+    n == apples.length == days.length
+    1 <= n <= 2 * 104
+    0 <= apples[i], days[i] <= 2 * 104
+    days[i] = 0 if and only if apples[i] = 0.
+```
+
+注意到：只要在当天前，把所有失效的苹果除掉或者吃完的苹果去掉即可。
+
+```c++
+#define L 40010
+int eatenApples(vector<int>& apples, vector<int>& days) {
+    int n = apples.size();
+    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
+    int ans = 0;
+    for (int i = 0; i < L; ++i) {
+        if (i < n) pq.push({i + days[i], apples[i]});
+        if (n <= i && pq.empty()) break;
+        while (pq.size()) {
+            auto [ld, lv] = pq.top(); pq.pop();
+            if (i < ld) {
+                --lv, ++ans;
+                if (lv) pq.push({ld,lv});
+                break;
+            }
+        }
+    }   
+    return ans;
+}
+```
+
+#### 2. Leetcode 1851: [Minimum Interval to Include Each Query](https://leetcode.cn/problems/minimum-interval-to-include-each-query/)
+
+题目描述：
+
+```
+You are given a 2D integer array intervals, where intervals[i] = [lefti, righti] describes the ith interval starting at lefti and ending at righti (inclusive). The size of an interval is defined as the number of integers it contains, or more formally righti - lefti + 1.
+
+You are also given an integer array queries. The answer to the jth query is the size of the smallest interval i such that lefti <= queries[j] <= righti. If no such interval exists, the answer is -1.
+
+Return an array containing the answers to the queries.
+
+Example 1:
+
+Input: intervals = [[1,4],[2,4],[3,6],[4,4]], queries = [2,3,4,5]
+Output: [3,3,1,4]
+Explanation: The queries are processed as follows:
+- Query = 2: The interval [2,4] is the smallest interval containing 2. The answer is 4 - 2 + 1 = 3.
+- Query = 3: The interval [2,4] is the smallest interval containing 3. The answer is 4 - 2 + 1 = 3.
+- Query = 4: The interval [4,4] is the smallest interval containing 4. The answer is 4 - 4 + 1 = 1.
+- Query = 5: The interval [3,6] is the smallest interval containing 5. The answer is 6 - 3 + 1 = 4.
+
+Example 2:
+
+Input: intervals = [[2,3],[2,5],[1,8],[20,25]], queries = [2,19,5,22]
+Output: [2,-1,4,6]
+Explanation: The queries are processed as follows:
+- Query = 2: The interval [2,3] is the smallest interval containing 2. The answer is 3 - 2 + 1 = 2.
+- Query = 19: None of the intervals contain 19. The answer is -1.
+- Query = 5: The interval [2,5] is the smallest interval containing 5. The answer is 5 - 2 + 1 = 4.
+- Query = 22: The interval [20,25] is the smallest interval containing 22. The answer is 25 - 20 + 1 = 6.
+
+Constraints:
+
+    1 <= intervals.length <= 105
+    1 <= queries.length <= 105
+    intervals[i].length == 2
+    1 <= lefti <= righti <= 107
+    1 <= queries[j] <= 107
+```
+
+扫瞄线算法：
+
+```c++
+using pri=pair<int,int>;
+vector<int> minInterval(vector<vector<int>>& intervals, vector<int>& queries) {
+    int n = intervals.size(), m = queries.size();
+    vector<int> ans(m, -1);
+    vector<pri> nq(m);
+    for (int i = 0; i < m; ++i) nq[i] = {queries[i], i}; 
+    sort(nq.begin(), nq.end());
+    priority_queue<pri,vector<pri>,greater<pri>> pq; 
+    sort(intervals.begin(), intervals.end());
+    int id = 0, lv = intervals[0][0], a, b, e, l = -1, i = 0;
+    while (i < n || !pq.empty()) {
+        // get cur point
+        if (n <= i) { a = pq.top().second; }
+        else if (pq.empty()) a = intervals[i][0];
+        else a = min(intervals[i][0], e = pq.top().second);
+        // percept a)
+        l = (pq.empty()) ? -1 : pq.top().first;
+        while (id < m) {
+            auto& [xx, yy] = nq[id];
+            if (a <= xx) break;
+            ans[yy] = l;
+            ++id;
+        }
+        // remove <= a
+        while (!pq.empty() && pq.top().second <= a) pq.pop();
+        // update new point >= a
+        while (i < n && intervals[i][0] == a) {
+            b = intervals[i++][1];
+            pq.push({b - a + 1, b + 1});
+        }
+    }   
+    return ans;
+}
+```
+
+
+
+(add in 2022-10-30)
+
+##### 3. Leetcode 1353: [Maximum Number of Events That Can Be Attended](https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended/)
+
+扫瞄线算法，以下按数扫描
+
+```c++
+#define L 100010
+int maxEvents(vector<vector<int>>& events) {
+    multimap<int,int> dm; 
+    for (auto& v: events) {
+        int a = v[0], b = v[1];
+        dm.insert({a, b});
+    }   
+    priority_queue<int,vector<int>,greater<int>> q;
+    int ans = 0;
+    auto it = dm.begin();
+    for (int i = 1; i < L; ++i) {
+        while (it != dm.end() && it->first == i) {
+            q.push(it->second);
+            ++it;
+        }
+        while (!q.empty() && q.top() < i) q.pop();
+        if (!q.empty()) ++ans, q.pop();
+    }   
+    return ans;
+}
 ```
 
 
@@ -1509,10 +2331,11 @@ void dijkstra(int id = 0) { // fill dist array, dist for 0 - n is INT_MAX
     while (!q.empty()) {
         auto [d, u] = q.top(); t.pop();
         if (st[u]) continue;
+        st[u] = true;
         for (auto [v, w]: lk[u]) {
             if (d + w < dist[v]) {
                 dist[v] = d + w;
-                heap.push({d + w, v});
+                q.push({d + w, v});
             }
         }
     }
@@ -1966,3 +2789,600 @@ long long makeSimilar(vector<int>& nums, vector<int>& target) {
 Debug：
 
 1. 一开始debug 1那行仅写了if ()判断奇数才加J，导致死循环；
+
+
+
+## 2022-10-28
+
+### 一、Leetcode杯LCCUP 2022 秋季
+
+#### 第四题：[二叉树灯饰](https://leetcode.cn/contest/season/2022-fall/problems/U7WvvU/)
+
+解答方法很明显，动态规划即可。
+
+这道题值得注意的是运行速度。一开始写的是如下递归方式：
+
+```c++
+int helper(TreeNode* p, int st); // 对应于树节点p状态st，返回数值（操作次数）ans
+```
+
+于是，每一次函数运行，需要调用新的子函数8次；
+
+```c++
+for (int i = 0; i < 4; ++i) {
+    l[i] = helper(p->left, i);
+    r[i] = helper(p->right, i);
+}
+```
+
+这样做，运行速度是极慢的，结果也是超时的；
+
+应当换成以下做法：
+
+定义函数:
+
+```c++
+vector<int> helper(TreeNode* p); // 对应于树节点p，返回4个状态对应的操作次数向量
+```
+
+这样，只需要调用两次子函数即可：
+
+```c++
+l = helper(p->left), r = helper(p->right);
+```
+
+*********
+
+记住：递归函数应当控制子函数调用次数，越少越好，一般来说，2次为宜；
+
+## 2022-10-29
+
+一些曾经耗时较长、逻辑写不清楚的题：
+
+### 一、Leetocode 1654: [Minimum Jumps to Reach Home](https://leetcode.cn/problems/minimum-jumps-to-reach-home/)
+
+这道题一开始总是从常规动态规划的角度入手，但可惜的是，一遍遍历并不能解决问题。主要难点有二：
+
+1. 问题的本质实际上是搜索，而非线性递推；
+2. 问题存在一个上限，这个上限其实是max(f + a + b, x + b);;
+
+明白这两点后，这道题就不那么难了
+
+```c++
+#define L 40005
+int fb[L];
+int dp[L][2];
+int minimumJumps(vector<int>& forbidden, int a, int b, int x) {
+    memset(fb, 0, sizeof fb);
+    for (auto v: forbidden) fb[v] = 1;
+    queue<pair<int,int>> q;
+    memset(dp, -1, sizeof dp);
+    q.push({0, 0});
+    dp[0][0] = 0;
+    dp[1][0] = 0;
+    while (!q.empty()) {
+        auto f = q.front();
+        q.pop();
+        if (f.first + a < L && !fb[f.first + a] && dp[f.first + a][0] == -1) {
+            q.push({f.first + a, 0});
+            dp[f.first + a][0] = dp[f.first][f.second] + 1;
+        }
+        if (f.second == 0 && 0 <= f.first - b && !fb[f.first - b] && dp[f.first - b][1] == -1) {
+            q.push({f.first - b, 1});
+            dp[f.first - b][1] = dp[f.first][0] + 1;
+        }
+    }   
+    if (dp[x][0] == -1 && dp[x][1] == -1) return -1; 
+    if (dp[x][0] == -1) dp[x][0] = INT_MAX;
+    if (dp[x][1] == -1) dp[x][1] = INT_MAX;
+    return min(dp[x][0], dp[x][1]);
+}
+```
+
+### 二、Leetcode 1647: [Minimum Deletions to Make Character Frequencies Unique](https://leetcode.cn/problems/minimum-deletions-to-make-character-frequencies-unique/)
+
+按频次排序即可解决，需要注意的是，当前一个频率减到0时，下一个不是-1，依然是0；
+
+```c++
+int minDeletions(string s) {
+    int a[26];
+    memset(a, 0, sizeof a);
+    for (auto& v: s) a[v - 'a']++;
+    sort(a, a + 26, greater<int>());
+    int ans = 0;
+    for (int i = 1; i < 26; ++i) {
+        if (0 <= a[i - 1] && a[i - 1] <= a[i]) {
+            int m = max(0, a[i - 1] - 1);
+            ans += a[i] - m;
+            a[i] = m;
+        }
+    }
+    return ans;
+}
+```
+
+### 三、Leetcode 1648: [Sell Diminishing-Valued Colored Balls](https://leetcode.cn/problems/sell-diminishing-valued-colored-balls/)
+
+思路很简单，二分就能搞定。
+
+```c++
+#define MOD 1000000007
+int OD; 
+long long helper(vector<int>& inv, int num) {
+    long long ans = 0;
+    for (auto& v: inv) if (num <= v) ans += v - num + 1;
+    return ans;
+}
+int maxProfit(vector<int>& inventory, int orders) {
+    int l = 1, r = MOD;
+    OD = orders;
+    while (l < r) {
+        int m = l + r >> 1;
+        if (helper(inventory, m) < OD) r = m;
+        else l = m + 1;
+    }   
+    long long ans = 0, num = 0;
+    for (auto& v: inventory) {
+        if (l <= v) ans += (long long)(v + l) * (v - l + 1) >> 1, num += v - l + 1;
+    }   
+    ans += (orders - num) * (l - 1); 
+    return ans % MOD;
+}
+```
+
+### 四、Leetcode 1625: [Lexicographically Smallest String After Applying Operations](https://leetcode.cn/problems/lexicographically-smallest-string-after-applying-operations/)
+
+第一次做的时候总在考虑规律，试图一下子看出来最小值的规律，实际上并不用如此，唯暴力算法尔！
+
+方法一：队列加字典，简单粗暴
+
+```c++
+void _add(string& s, int a) {
+    for (int i = 0; i < s.length(); ++i) {
+        if (i & 1) {
+            int v = s[i] - '0';
+            s[i] = '0' + (v + a) % 10; 
+        }
+    }   
+}
+void _rotate(string& s, int b) {
+    int n = s.length();
+    s = s.substr(n - b, b) + s.substr(0, n - b); 
+}
+string findLexSmallestString(string s, int a, int b) {
+    int n = s.length();
+    unordered_set<string> ss({s});
+    queue<string> qs({s});
+    string ans = s;
+    while (!qs.empty()) {
+        auto f = qs.front(); qs.pop();
+        ans = min(ans, f); 
+        for (int i = 1; i <= 10; ++i) {
+            _add(f, a); 
+            if (!ss.count(f)) qs.push(f), ss.insert(f);
+        }
+        _rotate(f, b); 
+        if (!ss.count(f)) qs.push(f), ss.insert(f);
+    }   
+    return ans;
+}
+```
+
+方法二：全部遍历
+
+```c++
+string findLexSmallestString(string s, int a, int b) {
+    int t = 0, d = 0, sl = s.length();
+    string cp = s, ss = s;
+    int n = sl; 
+    for (int i = 0; i < 10; ++i) { // for odd bit
+        for (int j = 0; j < sl; ++j) if (j & 1) s[j] = ('9' < s[j] + a) ? s[j] + a - 10 : s[j] + a;
+        ss = s;
+        if (b & 1) {
+            for (int j = 0; j < 10; ++j) { // for even bit
+                for (int k = 0; k < sl; ++k) if (!(k & 1)) ss[k] = ('9' < ss[k] + a) ? ss[k] + a - 10 : ss[k] + a; 
+                for (int k = 0; k < sl; ++k) {
+                    //PR(ss);
+                    ss = ss.substr(n - b, b) + ss.substr(0, n - b); 
+                    if (ss.compare(cp) < 0) cp = ss; 
+                }
+            }
+        } else {
+            for (int k = 0; k < sl; ++k) {
+                ss = ss.substr(n - b, b) + ss.substr(0, n - b); 
+                if (ss.compare(cp) < 0) cp = ss; 
+            }
+        }
+    }   
+    return cp; 
+}
+```
+
+
+
+## 2022-10-30
+
+### 一、Leetcode 双周赛90
+
+#### 第四题：下一个更大元素 IV（总Leetcode 6227)
+
+思路一开始想到了，从后往前遍历，只要返回第二大的秩就好，但一开始没意识到可以通过线段树搞定，并且箱拓展思维，想试试从前往后遍历如何。
+
+然后，按顺序遍历的想，貌似可以用双指针搞定？一激动，吭哧吭哧地玛了大半代码后，想到了反例，此路不通，时间也浪费了大半。
+
+回到从后往前遍历，思考了很久，发现可以用线段树搞定；于是写了个非递归线段树，但写完才发现，无法从上到下的搜索，决定了非递归的方法无法返回第一个大于当前数的数的位置；有浪费了好久时间；
+
+最后，才用递归线段树的方法解决了这道题，调试完成再到最终通过，超时了18分钟。
+
+```c++
+#define L 100010
+#define M L << 2
+#define lson(x) ((x)<<1)
+#define rson(x) ((x)<<1|1)
+int sg[M], K;
+void update(int id, int v, int l, int r, int rk) {
+    if (r - l == 1) { sg[rk] = v; return; }
+    int m = l + r >> 1;
+    if (id < m) update(id, v, l, m, lson(rk));
+    else update(id, v, m, r, rson(rk));
+    sg[rk] = max(sg[lson(rk)], sg[rson(rk)]);
+}
+int search(int a, int b, int v, int l, int r, int rk) {
+    if (b <= a || sg[rk] <= v) return L;
+    if (r - l == 1) return l;
+    int m = l + r >> 1, ans = L;
+    if (a < m) ans = search(a, min(m, b), v, l, m, lson(rk));
+    if (ans < L) return ans;
+    if (m < b) ans = search(max(a, m), b, v, m, r, rson(rk));
+    return ans;
+}
+vector<int> secondGreaterElement(vector<int>& nums) {
+    int n = nums.size();
+    int i = 0, j = 0;
+    vector<int> ans(n);
+    for (int i = n - 1; 0 <= i; --i) {
+        int id = search(i + 1, n, nums[i], 0, n, 1); 
+        int nid = search(id + 1, n, nums[i], 0, n, 1); 
+        ans[i] = nid < n ? nums[nid] : -1; 
+        update(i, nums[i], 0, n, 1); 
+    }   
+    return ans;
+}
+```
+
+别人的思维方法：对秩排序，按大小顺序检索！！！
+
+```c++
+    vector<int> secondGreaterElement(vector<int>& a) {
+        auto cmp = [&](int i, int j) {
+            if (a[i] != a[j]) return a[i] > a[j];
+            return i < j;
+        };
+        int n = a.size();
+        vector <int> id(n);
+        for (int i = 0; i < n; i++) id[i] = i;
+        sort(id.begin(), id.end(), cmp);
+        vector <int> ans(n, -1);
+        set <int> all;
+        for (int i = 0; i < n; i++) {
+            int j = id[i];
+            auto it = all.lower_bound(j);
+            if (it != all.end()) {
+                ++it;
+                if (it != all.end()) ans[j] = a[*it];
+            }
+            all.insert(j);
+        }
+        return ans;
+    }
+```
+
+
+
+### 二、Leetcode 周赛317
+
+#### 1. 第四题：移除子树后的二叉树高度(总Leetcode 6223)
+
+这道题主要浪费时间点在两方面：
+
+* 关键点1：主要关键在于叶节点，删除一个子数对总高度的影响，实际上可以简化到对应叶节点的变化。这个关键点让我想了很久才想到，到最终形成解题思路，只剩半小时不到了； 
+* 用线段树维护不断查询的区间；与昨晚（见上，双周90最后一题）恰好相反，为了避免麻烦，直接用非递归方法实现（因为错误的以为，非递归能搞定的，递归的写法也一定能搞定）。但码完代码后才发现，悲剧了，因为我直接在原树上建线段树，但原树的高度是可以$10^5$级别的，很明显，秩超了；
+
+最终，用非递归的方式实现了，关键点就在于，把所有叶节点抽出来建树；当然，抽出来后同样可以用递归线段树解决，但从形式上来讲，非递归更加自然些。
+
+```c++
+#define L 100010
+#define LL L<<1
+#define lson(x) (x<<1)
+#define rson(x) (x<<1|1)
+int tot = 0, M;
+int dt[L], sg[LL];
+pair<int,int> rg[L];
+void build(TreeNode* p, int dpt) {
+    if (!p) return;
+    if (!p->left && !p->right) { 
+        rg[p->val] = {tot, tot + 1}; 
+        sg[tot++] = dpt;
+        dt[p->val] = dpt; 
+        return; 
+    }   
+    build(p->left, dpt + 1); 
+    build(p->right, dpt + 1); 
+    int l = p->left ? rg[p->left->val].first : rg[p->right->val].first;
+    int r = p->right ? rg[p->right->val].second : rg[p->left->val].second;
+    rg[p->val] = {l, r};
+    dt[p->val] = dpt;
+}
+void build_tree() {
+    M = 1; while (M < tot + 2) M <<= 1;
+    for (int i = M + tot; M < i; --i) sg[i] = sg[i - M - 1];
+    sg[M] = 0;
+    for (int i = M + tot + 1; i < M * 2; ++i) sg[i] = 0;
+    for (int i = M - 1; 0 < i; --i) 
+        sg[i] = max(sg[lson(i)], sg[rson(i)]);
+}
+int search(int l, int r) {
+    int ans = 0, s = M + l, t = M + r + 1;
+    for (; s ^ t ^ 1; s >>= 1, t >>= 1) { 
+        if (~s & 1) ans = max(ans, sg[s ^ 1]);
+        if (t & 1) ans = max(ans, sg[t ^ 1]);
+    }
+    return ans;
+}
+vector<int> treeQueries(TreeNode* root, vector<int>& queries) {
+    build(root, 0);
+    build_tree();
+    int m = queries.size();
+    vector<int> ans(m);
+    for (int i = 0; i < m; ++i) {
+        int bv = queries[i];
+        auto [l, r] = rg[bv];
+        int res = dt[bv] - 1;
+        int lr = search(0, l);
+        res = max(lr, res);
+        int rr = search(r, tot);
+        res = max(rr, res);
+        ans[i] = res;
+    }
+    return ans;
+}
+```
+
+
+
+### 三、总结（双90、单317）
+
+最需要改进的是思考问题的方式，想到思路，形成解题方案，码完代码加调试，整个速度都太慢。今天这两题，明显感觉到思路太慢，一方面不够果断，想到一个方向后，因为想法太多，又跑去试另一种；另一方面，没有形成有效的解题思维，解决问题的手段不多，先暴力再优化的思想没有贯彻，总是在想取巧的方法。
+
+对此，作如下思维优化，警醒自己，时刻保持高效的思维方式，提高思维速度。
+
+```
+1. 答案不明显时，遵循“先暴力，后优化“的思路，抓主问题的关键点；
+2. 直奔答案。从答案反推，与第一点呼应，强调自己始终奔着答案去，而不是想些无助于答案、有的没的的优化；
+3. 坚决果断。想到一种可以在规定时间内完成的方法，应大胆实现；不宜东一敲，西一锤，两边取巧，结果适得其反；
+4. 线段树的认识：重点1：二叉树不等于线段树，直接在二叉树上建线段树不可取；重点2：搞清楚递归和非递归线段树的区别，二者的“能”与“不能”。
+```
+
+
+
+## 2022-11-14
+
+### 一、Leetcode 周赛318
+
+这期周赛的思路都比算太难想，除了最后一题的DP要稍微思考以下外；这周的题目主要侧重数据结构的考察。
+
+#### 1. 第三题：[Total Cost to Hire K Workers](https://leetcode.cn/problems/total-cost-to-hire-k-workers/)
+
+这题，我的做法是，使用两个优先级队列模拟选人操作，思路没有问题，主要是debug破费了一些时间，包括初始化两个队列，如何选择确定，队列相遇时如何再选直至满足题目的元素个数等等，几乎每一步都出了bug，调了半天。继续加油，锻炼思维的严谨性，提高代码编写正确性和速度。
+
+#### 2. 第四题：[Minimum Total Distance Traveled](https://leetcode.cn/problems/minimum-total-distance-traveled/)
+
+这题毫无疑问。用动态规划搞定，一开始以为是二维问题，定义$DP[i][j]$即可搞定，写了一遍后才发现是三维问题，需要定义$DP[i][j][k]$,表示：对于工厂i，考虑将以$j$结尾的后$k$个元素放入其中的最优组合方案。递推公式不难写出，不再赘述。我的问题还是：知道用什么方法，但形成解决方案直到码完代码，所需时间还是太长。
+
+### 二、Leetcode 双周赛91
+
+这次双周赛的题目，从思路上来说，颇有些难度，即使第二题，也要用DP来解决；所幸这次，前三题我依旧像往常一样快速解决。
+
+#### 1. 第二题：[Count Ways To Build Good Strings](https://leetcode.cn/problems/count-ways-to-build-good-strings/)
+
+想到用DP来做就不算难了，毕竟递推公式很容易写出。
+
+#### 2. 第三题：[Most Profitable Path in a Tree](https://leetcode.cn/problems/most-profitable-path-in-a-tree/)
+
+这道题，我的思路是：先走b，然后记录b经过的节点和时间，然后走a，遍历整棵树，返回最大值；因为需要父节点信息，所以要BFS建立节点信息。
+
+这道题主要的debug点在于，b不经过的其他节点都应当赋值为最大时间，而不是0。
+
+#### 3. 第四题：[Split Message Based on Limit](https://leetcode.cn/problems/split-message-based-on-limit/)
+
+思路对于目前的我来说还是很容易想到，二分！但问题还是，30分钟的时间内无法码完代码并调试完成，主要在于，这道题需要处理的子问题有些多。
+
+总之，再保证正确性的基础上，我还需要加速加速再加速！
+
+
+
+### 三、Leetcode 周赛319
+
+四道题的思路都不难想到，问题还是：完成代码太慢。
+
+#### 1. 第三题：[Minimum Number of Operations to Sort a Binary Tree by Level](https://leetcode.cn/problems/minimum-number-of-operations-to-sort-a-binary-tree-by-level/)
+
+这道题我用了并查集，但实际上并无必要，暴力即可，时间复杂度是一样的。主要考点是BFS。
+
+#### 2. 第四题：[Maximum Number of Non-overlapping Palindrome Substrings](https://leetcode.cn/problems/maximum-number-of-non-overlapping-palindrome-substrings/)
+
+我的做法是：Manacher‘s Algorithm + 贪心算法
+
+问题是：处理贪心队列时，破费了一些时间，对于边界没有定义清楚，导致来回修改进队数据。
+
+看别人的做法，直接用DP全部搞定。
+
+```c++
+class Solution {
+    int f[2005];
+    bool b[2005][2005];
+public:
+    int maxPalindromes(string s, int k) {
+        int n=s.size(),i,j;
+        for(i=0;i<n;i++)b[i][i]=1;
+        for(i=0;i+1<n;i++)b[i][i+1]=s[i]==s[i+1];
+        for(i=n-1;~i;i--)for(j=i;j<n;j++)if(i==j)b[i][j]=1;
+        else if(i+1==j)b[i][j]=s[i]==s[j];
+        else b[i][j]=s[i]==s[j]&&b[i+1][j-1];
+        for(i=k;i<=n;i++)for(f[i]=f[i-1],j=0;j+k<=i;j++)if(b[j][i-1])f[i]=max(f[i],f[j]+1);
+        return f[n];
+    }
+};
+```
+
+
+
+## 2020-11-19
+
+### 一、人工智能基本算法复习
+
+#### 1. A*算法
+
+可以看成是BFS的扩展，主要是决定哪些节点应当优先被扩展。
+$$
+f(n) = g(n) + h(n)，其中，g(n)表示从起点到节点n的距离，h(n)表示从节点n到终点的启发函数-路径估计，f(n)表示节点n的耗散值。
+$$
+总的来说，就是按照f(n)从小到大依次选取路径。
+
+```c++
+while(OPEN!=NULL)
+{
+    从OPEN表中取f(n)最小的节点n;
+    if(n节点==目标节点)
+        break;
+    for(当前节点n的每个子节点X)
+    {
+        计算f(X);
+        if(XinOPEN)
+            if(新的f(X)<OPEN中的f(X))
+            {
+                把n设置为X的父亲;
+                更新OPEN表中的f(n);
+            }
+        if(XinCLOSE)
+            continue;
+        if(Xnotinboth)
+        {
+            把n设置为X的父亲;
+            求f(X);
+            并将X插入OPEN表中;//还没有排序
+        }
+    }//endfor
+    将n节点插入CLOSE表中;
+    按照f(n)将OPEN表中的节点排序;//实际上是比较OPEN表内节点f的大小，从最小路径的节点向下进行。
+}//endwhile(OPEN!=NULL)
+```
+
+
+
+#### 2. AO\*算法（与或图的A*算法）
+
+与A*算法想似的思想，在与或图中，我们无法直接判断一个节点的价值，此时对应的应该是与或图中的一个子图结构，我们给这个子图打分，就是所谓的AO\*算法。
+
+每次扩展的都是一个子图结构，标记的是子图的连接符，直到原节点被标记成solved，算法终止。
+
+```
+PROCEDURE AO*
+	建立一个只由根节点构成的搜索图G
+		s的费用：q(s) := h(s), G' := G.
+		如果s是目标，标记s为SOLVED.
+	Until s被标记为SOLVED, do:
+	begin:
+		在G'中，从s出发，选择一个非终止的叶节点n。
+		扩展n及其所有后继，连接至G上。
+			对于每一个不曾在G中出现的后继nj，q(nj) := h(nj)；
+			如果这些后继中某些节点是终止节点，则用SOLVED标记。
+		S := {n};建立一个只由n构成的单元素集合S。
+		Untile S变空，do:
+		begin:
+			从S中删除节点m，满足m在G中的后继不出现在S中
+			按以下步骤修改m的费用q(m）：
+				对于每一从m出发的指向节点集合{n1,n2,...,nk}的连接符，
+				计算：
+					qi(m) = ci + q(n1) + ... + q(nk);
+				取q(m)为qi(m)中的最小值，并：
+					1) 将指针标记加到该最小值的连接符上；
+					2) 如果本次标记不同以往，抹去之前的标记（修改G‘）；
+					3）如果这个连接符指向的所有节点都是SOLVED，标记m为SOLVED；
+				如果m标记为SOLVED，或者m的费用与之前不同，则：
+					把m的所有有指针标记连接的父节点加到S中。
+		end
+	end
+```
+
+
+
+#### 3. 分枝定界法与$\alpha$-$\beta$剪枝
+
+简单来说，与之前做过的“人选箱”加界限类似，在搜索过程中不断确定答案的界限，对于超过界限的搜索方向直接剪掉，就是所谓的分枝定界法。
+
+而博弈-棋类问题中，一般对应极大极小策略，这时候用定界法实际上是确定上下两个界限，这就是所谓的$\alpha-\beta$剪枝。
+
+
+
+#### 4. 遗传算法
+
+遗传算法的[基本运算](https://baike.baidu.com/item/基本运算?fromModule=lemma_inlink)过程如下： [2] 
+
+（1）初始化：设置进化代数计数器t=0，设置最大进化代数T，随机生成M个个体作为初始群体P(0)。 [2] 
+
+（2）个体评价：计算群体P(t)中各个个体的[适应度](https://baike.baidu.com/item/适应度?fromModule=lemma_inlink)。 [2] 
+
+（3）[选择运算](https://baike.baidu.com/item/选择运算?fromModule=lemma_inlink)：将选择算子作用于群体。选择的目的是把优化的个体直接遗传到下一代或通过配对交叉产生新的个体再遗传到下一代。选择操作是建立在群体中个体的[适应度](https://baike.baidu.com/item/适应度?fromModule=lemma_inlink)评估基础上的。 [2] 
+
+（4）交叉运算：将交叉算子作用于群体。遗传算法中起核心作用的就是交叉算子。 [2] 
+
+（5）[变异运算](https://baike.baidu.com/item/变异运算?fromModule=lemma_inlink)：将变异算子作用于群体。即是对群体中的个体串的某些[基因座](https://baike.baidu.com/item/基因座?fromModule=lemma_inlink)上的基因值作变动。群体P(t)经过选择、交叉、[变异运算](https://baike.baidu.com/item/变异运算?fromModule=lemma_inlink)之后得到下一代群体P(t+1)。 [2] 
+
+（6）终止条件判断：若t=T,则以进化过程中所得到的具有最大[适应度](https://baike.baidu.com/item/适应度?fromModule=lemma_inlink)个体作为[最优解](https://baike.baidu.com/item/最优解?fromModule=lemma_inlink)输出，终止计算。 [2] 
+
+[遗传操作](https://baike.baidu.com/item/遗传操作?fromModule=lemma_inlink)包括以下三个基本遗传[算子](https://baike.baidu.com/item/算子?fromModule=lemma_inlink)(genetic operator):选择(selection)；交叉(crossover)；[变异](https://baike.baidu.com/item/变异?fromModule=lemma_inlink)(mutation)。 [1] 
+
+
+
+#### 5. 模拟退火算法
+
+```
+(1) 初始化：初始温度T(充分大)，初始解状态S(是算法迭代的起点)，每个T值的迭代次数L
+(2) 对k=1, …, L做第(3)至第6步：
+(3) 产生新解S′
+(4) 计算增量ΔT=C(S′)-C(S)，其中C(S)为评价函数
+(5) 若ΔT<0则接受S′作为新的当前解，否则以概率exp(-ΔT/T)接受S′作为新的当前解.
+(6) 如果满足终止条件则输出当前解作为最优解，结束程序。
+终止条件通常取为连续若干个新解都没有被接受时终止算法。
+(7) T逐渐减少，且T->0，然后转第2步。
+```
+
+
+
+## 2022-11-20
+
+### 一、Leetcode  周赛320
+
+#### 第二题（总6242）：二叉搜索树最近节点查询 
+
+这道题走了一点弯路，一开始直接在树上搜索最金节点，结果显然是超时的；
+
+转换思路，化为排序数组查询，显然会更快，此时已经可以通过了；
+
+其实还可以更近一步，对待查询数组排序，按从小到大查询再输出，显然会更快。
+
+#### 第三题（总6243）：到达首都的最少油耗
+
+这道题想歪了。第一个想法是：从最深节点开始，每次往上（父节点方向）数seats次，这些节点同乘一辆车；依次类推，这样的贪心策略会是最好的吗？
+
+显然，结果错了，考虑:
+
+vector<vector<int>> n = {{0,1},{0,2},{1,3},{1,4}}; int s = 5;
+
+的情形；可以知道，正确的做法是，再每一个节点出判断：再该节点处标记油耗p和总人数n，由下往上递推，才能得到正确的答案；
+
+#### 第四题（总6244）：完美分割的方案数
+
+这道题倒是不难，有点类似与字典-字符串，动态规划，一遍过，就是形成解决方案还是太慢。
+
