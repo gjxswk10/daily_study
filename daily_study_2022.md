@@ -3258,15 +3258,15 @@ while(OPEN!=NULL)
     for(当前节点n的每个子节点X)
     {
         计算f(X);
-        if(XinOPEN)
+        if(X in OPEN)
             if(新的f(X)<OPEN中的f(X))
             {
                 把n设置为X的父亲;
                 更新OPEN表中的f(n);
             }
-        if(XinCLOSE)
+        if(X in CLOSE)
             continue;
-        if(Xnotinboth)
+        if(X notin both)
         {
             把n设置为X的父亲;
             求f(X);
