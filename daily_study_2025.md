@@ -93,9 +93,28 @@ windows： 进入文件C:\windows\Fonts
 
 看到了Unity 3D新出现的工具Addressables，打算用新工具尝试一下，看看能不能完全还原人物模型。
 
-## 2025-04-14
+## 2025-04-17
 
-## 一、重构九野资源
+## 一、折腾Addressables
+
+折腾了这些天的Addressables，以为能直接用它来正确、完整地加载AssetBundle文件，完美还原所有模型和依赖关系，结果今晚才发现：不能！！！它还是要用AssetBundle自身的API来进行加载。好吧，白忙活这些天了。
+
+以后要加快文档阅读速度，提高效率，抓住重点，避免浪费无意义的时间。
+
+
+
+## 2025-04-18
+
+### 一、重新思考AssetBundle正确加载模型的问题
+
+做了以下尝试：
+
+* 重试了异步写法（于本次目标而言无关紧要，只是为了长远做准备）；
+* 尝试了预加载，先加载Material、Texture2D，再加载类型，失败；
+* 学习B站Up主LC_ilmlp关于Shader、MonoBehaviour的读取；
+* 重新分析Card_284_001.ab结构，分析各个MonoBehaviour间的关系；
+* 确定Card_284_001.ab中包含Manifest清单，最终找到files/dat文件下的总Manifest文件；
+* 初步分析Manifest中给出的依赖项。
 
 
 
