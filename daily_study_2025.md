@@ -512,3 +512,106 @@ ShaderCache的作用和重要性
 今晚，打了一下Log信息检查时才发现，根本就不是Userid这一行代码报的错，而是MatchmakingSDK.Initialize()报的错。定位错误位置之后就很容易解决了，这个是因为UOS Launcher中，没有Link App造成的。重新Link一下，问题就解决了。
 
 这一Debug过程也提醒了我，不要想当然的Debug，要反复确认出Bug的位置，否则只是缘木求鱼罢了。
+
+## 2025-05-31
+
+### 一、无法实现对战匹配的问题
+
+本以为成功迁移完目录后，接下来会很顺利，但没想到又遇到新的BUG拦路，一拦又是好几天。
+
+```
+Exception: Scene Hash 201245100 does not exist in the HashToBuildIndex table!  Verify that all scenes requiring server to client synchronization are in the scenes in build list.
+Unity.Netcode.NetworkSceneManager.ScenePathFromHash (System.UInt32 sceneHash) (at ./Library/PackageCache/com.unity.netcode.gameobjects@1.11.0/Runtime/SceneManagement/NetworkSceneManager.cs:712)
+```
+
+查找了一些资料，个人觉得比较靠谱的一个说法是：服务器中的场景与客户端不一致导致同步出错（可能是名称不同，或者服务端有该场景，但客户端没有等等）。但即使如此，尝试半天后仍然无果，并不知道究竟从何入手解决该Bug。
+
+后来，返回之前版本测试时发现，之前怀疑的原因：场景覆盖、Addressables包、Scenes In Build需要单独或者第一视角等等，都不太对。因为返回版本后，都可以成功跑出来，服务器与客户端的逻辑正确。
+
+再回到迁移出目录的这个版本，打算重构UOS服务器到Matchmaking匹配这一路径，但在Multiverse Image这一步就卡住了，无法成功构建镜像。而且，无法准确看到镜像构建失败的原因，只能瞬间看到类似"脚本出现Bug"的错误提示。
+
+因此，目前我怀疑的Bug原因主要有二：1. 很可能是路径迁移后，导致部分设置路径不能正确识别造成的；2. 脚本可能在运行中才出现了某类Bug，编译时没有。但无论哪种原因，直到今天下午，我仍无法确认并解决。
+
+
+
+## 2025-06-16
+
+上一个Bug至今仍未完全解决，中间也浪费了不少时间，目前有如下进展：
+
+### 一、架构UOS + Multiverse终端服务器dedicated server问题
+
+为了确认Bug究竟哪里出现，尝试了无.asmdef文件的版本MultiverseNetcodeDemo（即在初始网络架构时下载无.asmdef、无Sample的完整代码）。
+
+尝试后，运行发现，同样出现该Bug，
+
+```
+Exception: Scene Hash 201245100 does not exist in the HashToBuildIndex table!  Verify that all scenes requiring server to client synchronization are in the scenes in build list.
+Unity.Netcode.NetworkSceneManager.ScenePathFromHash (System.UInt32 sceneHash) (at 
+。。。
+```
+
+这让我非常困惑，同时，此时尝试创建新的dedecated server镜像和启动配置都是不成功的（build dedicated server error）。经过几天的尝试后，发现在BootstrapManager.cs脚本中，添加如下编译头后，即可成功生成新的镜像和启动配置：
+
+```C#
+using Unity.UOS.Multiverse;
+using Unity.UOS.Multiverse.Exceptions;
+using Unity.UOS.Multiverse.Models;
+```
+
+此时，再启动两个客户端，即可成功运行预定程序，无任何Bug！！！
+
+### 二、回到新野，AuthTokenManager Error
+
+由于上述一的启发，回到新野工程项目，如法泡制，但结果并不顺利，仍然是Scene Hash 201245100错误。
+
+对比两边的关键代码，首先定位于AuthTokenManager这一行，在MultiverseNetcodeDemo中，是这样写的：
+
+```C#
+await AuthTokenManager.ExternalLogin(_userId);
+```
+
+而在XingYe项目中，我是这样写的：
+
+```C#
+await UOS.Auth.AuthTokenManager.ExternalLogin(_userId);
+```
+
+之所以这样写，是因为直接向MultiverseNetcodeDemo中那样写会报错，找不到ExternalLogin函数，尽管XingYe包含了所有前者的头文件。
+
+几番折腾之后，定位了出错地：原来是在XingYe的Asset目录下，我写了一个AuthTokenManager.cs脚本（这是之前初建工程时不熟悉的时候，自己建的一个空方法的同名脚本，挂载到相同位置，之后才知道是要已有的脚本），没有删除。
+
+将该多余脚本删除后，就可以解决该Bug了。
+
+解决该Bug后，继续运行，仍然是报Scene Hash的错误，目前停在这一步。
+
+目前觉得最主要原因就是，终端服务器没有构建成功，导致了该错误，而该错误仅会显示在客户端。
+
+
+
+## 2025-06-28
+
+### 一、定位Scene Hash Bug位置
+
+通过这么多天的反复折腾，从新的无Bug项目一步步重构，每小步成功后继续向前试错，终于定位了该Bug的位置。
+
+我是从无.asmdef文件的项目开始的，给该项目解决(2025-06-16 | 一)中的Bug后，即可得到最初的无错版本，当导入九野资源时，并没有出错，而当导入LoadJiuyeAssetBundle.cs文件时，则无法正确生成服务器启动程序，提示脚本出错。
+
+然而，在脚本文件页面中，脚本是没有报错的，并且如前所示，该脚本能够在本地正确加载九野资源和场景。这就是目前遇到的难点了，无法准确知道究竟是什么错，在Google搜索同样无果。
+
+接下来的计划是：依样画葫芦，将该脚本逐行导入，定位具体的Bug位置。
+
+（PS: 猜测，或许和目录Bootstrap有关？移出该目录，放入Scripts目录下是否可行？）
+
+## 2025-06-29
+
+### 一、终于最终搞定Scene Hash Bug！！！
+
+按照逐行增加法，最终定位确定了Bug的位置：
+
+```C#
+//using UnityEditorInternal;
+```
+
+就是因为这一行代码，导致LoadJiuyeAssetBundle.cs文件在生成服务器镜像文件时编译出错，导致服务器无法正常建立，导致服务器端与客户端不同步，导致之后的无错（不报错）Bug（但是无法正常运行）。
+
+搞定之后，心情舒畅！！！我终于可以进行下一步了，泪目，卡在这里好久了！
